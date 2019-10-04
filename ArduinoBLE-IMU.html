@@ -4,7 +4,7 @@
   <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
-  <script src="3d-model/GLTFLoader.js"></script>
+
   <style>
   body,h1,p {margin: 16;background: #ffffff;color: black;font-family: 'Comfortaa', cursive;}
   h1 {font-size: 20px;}
@@ -45,11 +45,7 @@ var myDevice;
 // Arduino IMU data array
 var graphData = {x: [], y: [], z:[]};
 
-// 3D scene
-var renderer = new THREE.WebGLRenderer();
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, 1, 1, 10000);
-var arduinoModel;
+
 
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
@@ -131,12 +127,7 @@ function updateData(x,y,z) {
   // Update graph
   Plotly.update('graph', {y: [graphData.x,graphData.y,graphData.z]});
 
-  // Update 3D model
-  arduinoModel.rotation.x = (x-lastX) * 0.0174533; // delta converted to radians
-  arduinoModel.rotation.y = (y-lastY) * 0.0174533;
-  arduinoModel.rotation.z = (z-lastZ) * 0.0174533;
 
-  renderer.render(scene, camera);
 }
 
 function initGraph(){
@@ -164,41 +155,6 @@ function initGraph(){
   });
 }
 
-function init3D(){
-
-  var container = document.getElementById( '3d' );
-  var loader = new THREE.GLTFLoader();
-
-  scene.background = new THREE.Color( 0xffffff );
-  renderer.setSize( 200, 200 );
-  renderer.setPixelRatio( 4 );
-  container.appendChild( renderer.domElement );
-
-  loader.load( '3d-model/arduino.gltf',
-  // called when the Arduinio model is loaded
-  function ( gltf ) {
-    // Model
-    arduinoModel = gltf.scene;
-    scene.add(arduinoModel);
-
-    // Light
-    var light1 = new THREE.PointLight(0xc0f0ff, 9, 0);
-    light1.position.set(20, -1, 20);
-    scene.add(light1);
-    var directionalLight = new THREE.HemisphereLight( 0xffffbb, 0x002080, 1);
-    directionalLight.position.set(10,0,0);
-    scene.add( directionalLight );
-    var light = new THREE.AmbientLight( 0x111111 );
-    scene.add( light );
-
-
-
-    // Camera
-    camera.position.set (5,0,0);
-    camera.rotation.y = Math.PI; // 180
-    camera.lookAt(new THREE.Vector3(0,0,0));
-    renderer.render(scene, camera);
-  }
 );
 };
 
