@@ -1,11 +1,8 @@
-# 8bitkick.github.io
+# ligamed.github.io
 
 
-Here's how to see a 3D model of your Arduino MKR 1010 and some wavy lines moving in realtime:
+Here is our webapp:
 
-- Connect your IMU Shield to your MKR 1010, and connect to your laptop/PC by USB
-- Compile the BLE_IMU.ino sketch and upload to your Arduino MKR 1010 
-- Point your Chrome browser [here](https://8bitkick.github.io/ArduinoBLE-IMU.html)
-- Press the green button on the webpage to pair to your Arduino
-- Watch it go!
+
+- Point your Chrome browser [here](https://ligamed.github.io/ArduinoBLE-IMU.html)
 
