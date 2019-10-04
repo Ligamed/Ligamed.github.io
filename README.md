@@ -1,3 +1,3 @@
 # LIGAMED
 
-[here](https://zacharyegner.github.io/Ligamed/ArduinoBLE-IMU.html)
+[here](https://ligamed.github.io/ArduinoBLE-IMU.html) 
