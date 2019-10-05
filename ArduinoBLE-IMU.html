@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+  <title>LIGAMED!</title>
   <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
@@ -16,17 +17,20 @@
   </style>
 </head>
 <body>
-  <h1>LIGAMED</h1>
-  <p>test</p>
+  <img src="Ligamed_logo.jpg">
+  <p>Connect to bluetooth to begin</p>
 
   <div style="width:95%;height:100%;border-color: white;border-style: solid;border-width: 1;">
     <div style="width:100%;height:30px;border-color: white;border-style: solid;border-width: 1;border-left:none;border-top:none;margin-top:5px;" id="status">
       <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect via Bluetooth LE</div>
     </div>
     <div style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
-      <div id="graph" style="margin-left: 200px;height:200px;"></div>
+      <div id="graph" style="height:200px;"></div>
     </div>
   </div>
+  <br>
+  <button>Train Right</button>
+  <button>Train Left</button>
 
 </body>
 <script type = 'text/javascript'>
@@ -143,8 +147,6 @@ function initGraph(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-
-
 initGraph();
 </script>
 </html>
