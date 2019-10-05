@@ -44,11 +44,7 @@ by Tom Igoe
 var myDevice;
 // Arduino IMU data array
 var graphData = {x: [], y: [], z:[]};
-// 3D scene
-var renderer = new THREE.WebGLRenderer();
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, 1, 1, 10000);
-var arduinoModel;
+
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
 const imuChar = '917649a1-d98e-11e5-9eec-0002a5d5c51b';
@@ -97,7 +93,7 @@ function handleData(event) {
   var x = event.target.value.getFloat32(0,true); // true = byte order from Arduino is littleEndian
   var y = event.target.value.getFloat32(4,true);
   var z = event.target.value.getFloat32(8,true);
-  updateData(-x,y,-z); // NB need to invert to match sensor coordinate system to our 3d model
+  
 }
 // disconnect function:
 function disconnect() {
@@ -124,7 +120,7 @@ function updateData(x,y,z) {
   arduinoModel.rotation.z = (z-lastZ) * 0.0174533;
   renderer.render(scene, camera);
 }
-function initGraph(){
+function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
   var i = 0;
@@ -147,6 +143,54 @@ function initGraph(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-initGraph();
+function initGraph2(){
+  var traceData=[];
+  var properties = ["x","y","z"];
+  var i = 0;
+  properties.forEach(function(key) {
+    i++;
+    var trace = {
+      y: [],
+      mode: 'scatter',
+      line: {color: colors[(i *2 )]},
+      name: key
+    };
+    traceData.push(trace);
+  });
+  Plotly.plot('graph', traceData,
+  {
+    plot_bgcolor: '#ffffff',
+    paper_bgcolor: '#ffffff',
+    margin: {l:30,r:30,b:25,t:25},
+    color: '#ffffff',
+    'xaxis': {'range': [500], 'autorange': "true"}
+  });
+}
+function initGraph3(){
+  var traceData=[];
+  var properties = ["x","y","z"];
+  var i = 0;
+  properties.forEach(function(key) {
+    i++;
+    var trace = {
+      y: [],
+      mode: 'scatter',
+      line: {color: colors[(i *2 )]},
+      name: key
+    };
+    traceData.push(trace);
+  });
+  Plotly.plot('graph', traceData,
+  {
+    plot_bgcolor: '#ffffff',
+    paper_bgcolor: '#ffffff',
+    margin: {l:30,r:30,b:25,t:25},
+    color: '#ffffff',
+    'xaxis': {'range': [500], 'autorange': "true"}
+  });
+}
+initGraph1();
+initGraph2();
+initGraph3();
 </script>
 </html>
