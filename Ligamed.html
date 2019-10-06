@@ -42,6 +42,8 @@
       <div id="graph2" style="height:200px;"></div>
     </div>
 
+    <p>Chance of Sprain<p>
+      <p id="insertpercentage"></p>
 
 
   <br>
@@ -136,6 +138,11 @@ function handleData(event) {
   updateData1(x1,y1,z1);
   updateData2(x2,y2,z2);
   //updateData3(x3,y3,z3);
+
+  if(x2>1000){
+    document.getElementById("insertpercentage").innerHTML = x2 / 5000;
+  }
+  
 }
 
 
