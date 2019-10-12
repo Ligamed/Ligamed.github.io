@@ -47,11 +47,17 @@
 
 
   <br>
-  
+
+        <td>Filename to Save As:</td>
+        <td><input id="inputFileNameToSaveAs"></input></td>
+        <td><button onclick="saveTextAsFile()">Save Text to File</button></td>
+
 
 
 </body>
 <script type = 'text/javascript'>
+
+
 
 //don't touch below here. I don't know what it does but it seems to be working
 
@@ -66,6 +72,7 @@ var myDevice;
 // Arduino IMU data array
 var graphData1 = {x: [], y: [], z:[]};
 var graphData2 = {x: [], y: [], z:[]};
+var fullArray = []
 
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
@@ -113,6 +120,7 @@ function connect() {
 
 //don't touch anything above here
 
+
 // handle incoming data:
 function handleData(event) {
   // get the data  from the peripheral:
@@ -134,7 +142,7 @@ function handleData(event) {
   document.getElementById("insertx2").innerHTML = event.target.value.getFloat32(12,true);
   document.getElementById("inserty2").innerHTML = event.target.value.getFloat32(16,true);
   document.getElementById("insertz2").innerHTML = event.target.value.getFloat32(20,true);
-
+ 
   updateData1(x1,y1,z1);
   updateData2(x2,y2,z2);
   //updateData3(x3,y3,z3);
@@ -142,7 +150,12 @@ function handleData(event) {
   if(x2>1000){
     document.getElementById("insertpercentage").innerHTML = x2 / 5000;
   }
-  
+
+  fullArray.push([x1,y1,z1,x2,y2,z2]);
+  //saves values to a new line in the giant matrix
+
+  //console.log(fullArray)
+
 }
 
 
@@ -172,17 +185,6 @@ function updateData2(x2,y2,z2) {
   // Update graph
   Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
 }
-
-/*
-// Handle Arduino client input data
-function updateData3(x3,y3,z3) {
-  graphData.x.push(x3);graphData.y.push(y3);graphData.z.push(z3);
-  // Only record last 200 entries
-  if (graphData.x.length>200) {graphData.x.shift();graphData.y.shift();graphData.z.shift();}
-  // Update graph
-  Plotly.update('graph3', {y: [graphData.x,graphData.y,graphData.z]});
-}
-*/
 
 function initGraph1(){
   var traceData=[];
@@ -231,34 +233,33 @@ function initGraph2(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-/*
-function initGraph3(){
-  var traceData=[];
-  var properties = ["x","y","z"];
-  var i = 0;
-  properties.forEach(function(key) {
-    i++;
-    var trace = {
-      y: [],
-      mode: 'scatter',
-      line: {color: colors[(i *2 )]},
-      name: key
-    };
-    traceData.push(trace);
-  });
-  Plotly.plot('graph3', traceData,
-  {
-    plot_bgcolor: '#ffffff',
-    paper_bgcolor: '#ffffff',
-    margin: {l:30,r:30,b:25,t:25},
-    color: '#ffffff',
-    'xaxis': {'range': [500], 'autorange': "true"}
-  });
-}
-*/
+
 
 initGraph1();
 initGraph2();
-//initGraph3();
+
+function saveTextAsFile()
+{
+    var textToSave = fullArray;
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+    var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
+ 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    downloadLink.href = textToSaveAsURL;
+    downloadLink.onclick = destroyClickedElement;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+ 
+    downloadLink.click();
+}
+ 
+function destroyClickedElement(event)
+{
+    document.body.removeChild(event.target);
+}
+
 </script>
 </html>
