@@ -241,7 +241,7 @@ initGraph2();
 function saveTextAsFile()
 {
     var textToSave = fullArray;
-    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
     var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
     var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
  
