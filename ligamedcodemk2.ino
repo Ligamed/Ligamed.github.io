@@ -79,7 +79,7 @@ void loop() {
       long currentMillis = millis();
 
       if (currentMillis - previousMillis >= 50) {
-          if (IMU.accelerationAvailable()) { // XX
+          if (IMU.gyroscopeAvailable()) { // XX
         previousMillis = currentMillis;
         sendSensorData();
           }
