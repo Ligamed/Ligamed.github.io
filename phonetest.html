@@ -26,9 +26,7 @@
       <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect LIGAMED Device</div>
     </div>
 
-    <button onclick="togglegraph()">Toggle Graphs</button>
     <br>
-
 
     <div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
       <div id="graph1" style="height:200px;"></div>
@@ -36,9 +34,7 @@
     <br>
 
 
-    <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
-      <div id="graph2" style="height:200px;"></div>
-    </div>
+
 
 
 </body>
@@ -60,7 +56,7 @@ by Tom Igoe
 var myDevice;
 // Arduino IMU data array
 var graphData1 = {x: [], y: [], z:[]};
-var graphData2 = {x: [], y: [], z:[]};
+
 var fullArray = []
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
@@ -111,14 +107,12 @@ function handleData(event) {
   var x1 = event.target.value.getFloat32(0,true); // true = byte order from Arduino is littleEndian
   var y1 = event.target.value.getFloat32(4,true);
   var z1 = event.target.value.getFloat32(8,true);
-  var x2 = event.target.value.getFloat32(12,true);
-  var y2 = event.target.value.getFloat32(16,true);
-  var z2 = event.target.value.getFloat32(20,true);
+
 
   //for displaying values
 
   updateData1(x1,y1,z1);
-  updateData2(x2,y2,z2);
+
 
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
@@ -139,13 +133,7 @@ function updateData1(x1,y1,z1) {
   Plotly.update('graph1', {y: [graphData1.x,graphData1.y,graphData1.z]});
 }
 // Handle Arduino client input data
-function updateData2(x2,y2,z2) {
-  graphData2.x.push(x2);graphData2.y.push(y2);graphData2.z.push(z2);
-  // Only record last 200 entries
-  if (graphData2.x.length>200) {graphData2.x.shift();graphData2.y.shift();graphData2.z.shift();}
-  // Update graph
-  Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
-}
+
 function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -169,31 +157,9 @@ function initGraph1(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-function initGraph2(){
-  var traceData=[];
-  var properties = ["x","y","z"];
-  var i = 0;
-  properties.forEach(function(key) {
-    i++;
-    var trace = {
-      y: [],
-      mode: 'scatter',
-      line: {color: colors[(i *2 )]},
-      name: key
-    };
-    traceData.push(trace);
-  });
-  Plotly.plot('graph2', traceData,
-  {
-    plot_bgcolor: '#ffffff',
-    paper_bgcolor: '#ffffff',
-    margin: {l:30,r:30,b:25,t:25},
-    color: '#ffffff',
-    'xaxis': {'range': [500], 'autorange': "true"}
-  });
-}
+
 initGraph1();
-initGraph2();
+
 
 
 
