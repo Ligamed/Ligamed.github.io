@@ -26,17 +26,46 @@
       <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect LIGAMED Device</div>
     </div>
 
+    <button onclick="togglegraph()">Toggle Graphs</button>
     <br>
+    <br>
+    <table style="width:400px;height:120px">
+      <col width="50%">
+      <col width="50%">
+      <tr>
+        <th>Acceleration</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <th>x</th>
+        <th id="insertx1"></th>
+      </tr>
+      <tr>
+        <th>y</th>
+        <th id="inserty1"></th>
+      </tr>
+      <tr>
+        <th>z</th>
+        <th id="insertz1"></th>
+      </tr>
+    </table>
 
-    <div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
+    <div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
       <div id="graph1" style="height:200px;"></div>
     </div>
     <br>
 
 
-
-
-
+  <br>
+    <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
+    <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
+    <br>
+    <br>
+    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
+    <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
+  <br>
+  <br>
+    <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
 </body>
 <script type = 'text/javascript'>
 
@@ -44,7 +73,14 @@
 
 
 //function to toggle graphs on/off. Saves processing power on weaker devices
-
+function togglegraph() {
+  var x = document.getElementById("graph1box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
 //don't touch below here. I don't know what it does but it seems to be working
 /*
 A Web Bluetooth connection example
@@ -110,10 +146,18 @@ function handleData(event) {
 
 
   //for displaying values
+  document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(0,true);
+  document.getElementById("inserty1").innerHTML = event.target.value.getFloat32(4,true);
+  document.getElementById("insertz1").innerHTML = event.target.value.getFloat32(8,true);
 
+ 
   updateData1(x1,y1,z1);
 
 
+  //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
+
+  var currenttime = event.timeStamp;
+  fullArray.push([currenttime,x1,y1,z1]);
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
 }
@@ -161,11 +205,79 @@ function initGraph1(){
 initGraph1();
 
 
+//saves data to a file
+function saveTextAsFile()
+{
+    var textToSave = fullArray;
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+
+ 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = "Ligamed";
+    downloadLink.innerHTML = "Download File";
+    downloadLink.href = textToSaveAsURL;
+    downloadLink.onclick = destroyClickedElement;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+ 
+    downloadLink.click();
+}
 
 
+//this was in the saving example. Not 100% sure why its needed
+function destroyClickedElement(event)
+{
+    document.body.removeChild(event.target);
+}
 
 
+//adds array line of where training data starts/stops. also toggles training buttons on/off accordingly
+function breakleft(){
+    fullArray.push("breakleft");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "block";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+function resumeleft(){
+    fullArray.push("resumeleft");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
 
+function breakright(){
+    fullArray.push("breakright");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "block";
+  }
+function resumeright(){
+    fullArray.push("resumeright");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
 
 
 
