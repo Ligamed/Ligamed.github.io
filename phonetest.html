@@ -172,7 +172,7 @@ function handleData(event) {
   var x1 = event.target.value.getFloat32(0,true); // true = byte order from Arduino is littleEndian
   var y1 = event.target.value.getFloat32(4,true);
   var z1 = event.target.value.getFloat32(8,true);
-  //var x2 = event.target.value.getFloat32(12,true);
+  var x2 = event.target.value.getFloat32(12,true);
   //var y2 = event.target.value.getFloat32(16,true);
   //var z2 = event.target.value.getFloat32(20,true);
 
@@ -180,7 +180,7 @@ function handleData(event) {
   document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(0,true);
   document.getElementById("inserty1").innerHTML = event.target.value.getFloat32(4,true);
   document.getElementById("insertz1").innerHTML = event.target.value.getFloat32(8,true);
-  //document.getElementById("insertx2").innerHTML = event.target.value.getFloat32(12,true);
+  document.getElementById("insertx2").innerHTML = event.target.value.getFloat32(12,true);
   //document.getElementById("inserty2").innerHTML = event.target.value.getFloat32(16,true);
   //document.getElementById("insertz2").innerHTML = event.target.value.getFloat32(20,true);
  
