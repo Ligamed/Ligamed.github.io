@@ -54,7 +54,30 @@
       <div id="graph1" style="height:200px;"></div>
     </div>
     <br>
+    <table style="width:400px;height:120px">
+      <col width="50%">
+      <col width="50%">
+      <tr>
+        <th>Angular Velocity</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <th>Roll</th>
+        <th id="insertx2"></th>
+      </tr>
+      <tr>
+        <th>Pitch</th>
+        <th id="inserty2"></th>
+      </tr>
+      <tr>
+        <th>Yaw</th>
+        <th id="insertz2"></th>
+      </tr>
+    </table>
 
+    <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
+      <div id="graph2" style="height:200px;"></div>
+    </div>
 
   <br>
     <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
@@ -80,6 +103,12 @@ function togglegraph() {
   } else {
     x.style.display = "none";
   }
+  var y = document.getElementById("graph2box");
+  if (y.style.display === "none") {
+    y.style.display = "block";
+  } else {
+    y.style.display = "none";
+  }
 }
 //don't touch below here. I don't know what it does but it seems to be working
 /*
@@ -92,7 +121,7 @@ by Tom Igoe
 var myDevice;
 // Arduino IMU data array
 var graphData1 = {x: [], y: [], z:[]};
-
+var graphData2 = {x: [], y: [], z:[]};
 var fullArray = []
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
@@ -140,26 +169,28 @@ function connect() {
 // handle incoming data:
 function handleData(event) {
   // get the data  from the peripheral:
-  var x1 = event.target.value.getFloat32(12,true); // true = byte order from Arduino is littleEndian
-  var y1 = event.target.value.getFloat32(16,true);
-  var z1 = event.target.value.getFloat32(20,true);
-
-
+  var x1 = event.target.value.getFloat32(0,true); // true = byte order from Arduino is littleEndian
+  var y1 = event.target.value.getFloat32(4,true);
+  var z1 = event.target.value.getFloat32(8,true);
+  //var x2 = event.target.value.getFloat32(12,true);
+  //var y2 = event.target.value.getFloat32(16,true);
+  //var z2 = event.target.value.getFloat32(20,true);
 
   //for displaying values
-  document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(12,true);
-  document.getElementById("inserty1").innerHTML = event.target.value.getFloat32(16,true);
-  document.getElementById("insertz1").innerHTML = event.target.value.getFloat32(20,true);
-
-
+  document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(0,true);
+  document.getElementById("inserty1").innerHTML = event.target.value.getFloat32(4,true);
+  document.getElementById("insertz1").innerHTML = event.target.value.getFloat32(8,true);
+  //document.getElementById("insertx2").innerHTML = event.target.value.getFloat32(12,true);
+  //document.getElementById("inserty2").innerHTML = event.target.value.getFloat32(16,true);
+  //document.getElementById("insertz2").innerHTML = event.target.value.getFloat32(20,true);
  
   updateData1(x1,y1,z1);
-
+  updateData2(x2,y2,z2);
 
   //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
 
   var currenttime = event.timeStamp;
-  fullArray.push([currenttime,x1,y1,z1]);
+  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,";"]);
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
 }
@@ -179,7 +210,13 @@ function updateData1(x1,y1,z1) {
   Plotly.update('graph1', {y: [graphData1.x,graphData1.y,graphData1.z]});
 }
 // Handle Arduino client input data
-
+function updateData2(x2,y2,z2) {
+  graphData2.x.push(x2);graphData2.y.push(y2);graphData2.z.push(z2);
+  // Only record last 200 entries
+  if (graphData2.x.length>200) {graphData2.x.shift();graphData2.y.shift();graphData2.z.shift();}
+  // Update graph
+  Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
+}
 function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -203,9 +240,31 @@ function initGraph1(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-
+function initGraph2(){
+  var traceData=[];
+  var properties = ["x","y","z"];
+  var i = 0;
+  properties.forEach(function(key) {
+    i++;
+    var trace = {
+      y: [],
+      mode: 'scatter',
+      line: {color: colors[(i *2 )]},
+      name: key
+    };
+    traceData.push(trace);
+  });
+  Plotly.plot('graph2', traceData,
+  {
+    plot_bgcolor: '#ffffff',
+    paper_bgcolor: '#ffffff',
+    margin: {l:30,r:30,b:25,t:25},
+    color: '#ffffff',
+    'xaxis': {'range': [500], 'autorange': "true"}
+  });
+}
 initGraph1();
-
+initGraph2();
 
 //saves data to a file
 function saveTextAsFile()
