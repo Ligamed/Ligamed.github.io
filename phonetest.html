@@ -174,7 +174,7 @@ function handleData(event) {
   var z1 = event.target.value.getFloat32(8,true);
   var x2 = event.target.value.getFloat32(12,true);
   var y2 = event.target.value.getFloat32(16,true);
-  //var z2 = event.target.value.getFloat32(20,true);
+  var z2 = event.target.value.getFloat32(20,true);
 
   //for displaying values
   document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(0,true);
@@ -182,7 +182,7 @@ function handleData(event) {
   document.getElementById("insertz1").innerHTML = event.target.value.getFloat32(8,true);
   document.getElementById("insertx2").innerHTML = event.target.value.getFloat32(12,true);
   document.getElementById("inserty2").innerHTML = event.target.value.getFloat32(16,true);
-  //document.getElementById("insertz2").innerHTML = event.target.value.getFloat32(20,true);
+  document.getElementById("insertz2").innerHTML = event.target.value.getFloat32(20,true);
  
   updateData1(x1,y1,z1);
   updateData2(x2,y2,z2);
