@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>LIGAMED!</title>
+  <title>LIGAMED DATA COLLECTION</title>
   <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
@@ -14,53 +14,103 @@
     text-decoration: none; font-size: 8px; margin: 4px 10px; height: 16px; width: 16px;
     border-radius: 50%; outline:none; font-family: 'Open Sans', sans-serif;
   }
+  table, th, td {border: 1px solid black; border-collapse: collapse;}
+  th, td {padding: 2px;}
   </style>
 </head>
 <body>
   <img src="Ligamed_logo.jpg" width="600">
   <p>Connect to bluetooth to begin</p>
-
   <div style="width:95%;height:100%;border-color: white;border-style: solid;border-width: 1;">
     <div style="width:100%;height:30px;border-color: white;border-style: solid;border-width: 1;border-left:none;border-top:none;margin-top:5px;" id="status">
-      <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect via Bluetooth LE</div>
+      <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect LIGAMED Device</div>
     </div>
-    <p>Acceleration</p>
-    <p id="insertx1"></p>
-    <p id="inserty1"></p>
-    <p id="insertz1"></p>
 
-    <div style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
+    <button onclick="togglegraph()">Toggle Graphs</button>
+    <br>
+    <br>
+    <table style="width:400px;height:120px">
+      <col width="50%">
+      <col width="50%">
+      <tr>
+        <th>Acceleration</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <th>x</th>
+        <th id="insertx1"></th>
+      </tr>
+      <tr>
+        <th>y</th>
+        <th id="inserty1"></th>
+      </tr>
+      <tr>
+        <th>z</th>
+        <th id="insertz1"></th>
+      </tr>
+    </table>
+
+    <div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
       <div id="graph1" style="height:200px;"></div>
     </div>
+    <br>
+    <table style="width:400px;height:120px">
+      <col width="50%">
+      <col width="50%">
+      <tr>
+        <th>Angular Velocity</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <th>Roll</th>
+        <th id="insertx2"></th>
+      </tr>
+      <tr>
+        <th>Pitch</th>
+        <th id="inserty2"></th>
+      </tr>
+      <tr>
+        <th>Yaw</th>
+        <th id="insertz2"></th>
+      </tr>
+    </table>
 
-    <p>Angle Rate</p>
-    <p id="insertx2"></p>
-    <p id="inserty2"></p>
-    <p id="insertz2"></p>
-
-    <div style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;">
+    <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
       <div id="graph2" style="height:200px;"></div>
     </div>
 
-    <p>Chance of Sprain<p>
-      <p id="insertpercentage"></p>
-
-
   <br>
-
-        <td>Filename to Save As:</td>
-        <td><input id="inputFileNameToSaveAs"></input></td>
-        <td><button onclick="saveTextAsFile()">Save Text to File</button></td>
-
-
-
+    <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
+    <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
+    <br>
+    <br>
+    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
+    <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
+  <br>
+  <br>
+    <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
 </body>
 <script type = 'text/javascript'>
 
 
 
-//don't touch below here. I don't know what it does but it seems to be working
 
+//function to toggle graphs on/off. Saves processing power on weaker devices
+function togglegraph() {
+  var x = document.getElementById("graph1box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var y = document.getElementById("graph2box");
+  if (y.style.display === "none") {
+    y.style.display = "block";
+  } else {
+    y.style.display = "none";
+  }
+}
+//don't touch below here. I don't know what it does but it seems to be working
 /*
 A Web Bluetooth connection example
 gathering three characteristics from a 3-axis accelerometer
@@ -73,7 +123,6 @@ var myDevice;
 var graphData1 = {x: [], y: [], z:[]};
 var graphData2 = {x: [], y: [], z:[]};
 var fullArray = []
-
 // fill your peripheral service and characteristic UUIDs here:
 const imuService = '917649a0-d98e-11e5-9eec-0002a5d5c51b';
 const imuChar = '917649a1-d98e-11e5-9eec-0002a5d5c51b';
@@ -92,7 +141,6 @@ if ("bluetooth" in navigator) {
 function status(stat){
   infoBar.innerHTML = stat;
 }
-
 // connect to the Bluetooth peripheral:
 function connect() {
   navigator.bluetooth.requestDevice({filters: [{ services: [imuService] }]
@@ -116,10 +164,7 @@ function connect() {
     console.error('Connection failed!', error);
   });
 }
-
-
 //don't touch anything above here
-
 
 // handle incoming data:
 function handleData(event) {
@@ -130,10 +175,6 @@ function handleData(event) {
   var x2 = event.target.value.getFloat32(12,true);
   var y2 = event.target.value.getFloat32(16,true);
   var z2 = event.target.value.getFloat32(20,true);
-  //var x3 = event.target.value.getFloat32(12,true);
-  //var y3 = event.target.value.getFloat32(14,true);
-  //var z3 = event.target.value.getFloat32(16,true);
-
 
   //for displaying values
   document.getElementById("insertx1").innerHTML = event.target.value.getFloat32(0,true);
@@ -145,20 +186,14 @@ function handleData(event) {
  
   updateData1(x1,y1,z1);
   updateData2(x2,y2,z2);
-  //updateData3(x3,y3,z3);
 
-  if(x2>1000){
-    document.getElementById("insertpercentage").innerHTML = x2 / 5000;
-  }
+  //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
 
-  fullArray.push([x1,y1,z1,x2,y2,z2]);
+  var currenttime = event.timeStamp;
+  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,";"]);
   //saves values to a new line in the giant matrix
-
   //console.log(fullArray)
-
 }
-
-
 // disconnect function:
 function disconnect() {
   if (myDevice) {
@@ -166,8 +201,6 @@ function disconnect() {
     myDevice.gatt.disconnect();
   }
 }
-
-
 // Handle Arduino client input data
 function updateData1(x1,y1,z1) {
   graphData1.x.push(x1);graphData1.y.push(y1);graphData1.z.push(z1);
@@ -176,7 +209,6 @@ function updateData1(x1,y1,z1) {
   // Update graph
   Plotly.update('graph1', {y: [graphData1.x,graphData1.y,graphData1.z]});
 }
-
 // Handle Arduino client input data
 function updateData2(x2,y2,z2) {
   graphData2.x.push(x2);graphData2.y.push(y2);graphData2.z.push(z2);
@@ -185,7 +217,6 @@ function updateData2(x2,y2,z2) {
   // Update graph
   Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
 }
-
 function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -209,7 +240,6 @@ function initGraph1(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-
 function initGraph2(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -233,20 +263,19 @@ function initGraph2(){
     'xaxis': {'range': [500], 'autorange': "true"}
   });
 }
-
-
 initGraph1();
 initGraph2();
 
+//saves data to a file
 function saveTextAsFile()
 {
     var textToSave = fullArray;
     var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
     var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-    var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
+
  
     var downloadLink = document.createElement("a");
-    downloadLink.download = fileNameToSaveAs;
+    downloadLink.download = "Ligamed";
     downloadLink.innerHTML = "Download File";
     downloadLink.href = textToSaveAsURL;
     downloadLink.onclick = destroyClickedElement;
@@ -255,11 +284,65 @@ function saveTextAsFile()
  
     downloadLink.click();
 }
- 
+
+
+//this was in the saving example. Not 100% sure why its needed
 function destroyClickedElement(event)
 {
     document.body.removeChild(event.target);
 }
+
+
+//adds array line of where training data starts/stops. also toggles training buttons on/off accordingly
+function breakleft(){
+    fullArray.push("breakleft");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "block";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+function resumeleft(){
+    fullArray.push("resumeleft");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+
+function breakright(){
+    fullArray.push("breakright");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "block";
+  }
+function resumeright(){
+    fullArray.push("resumeright");
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+
+
+
+
 
 </script>
 </html>
