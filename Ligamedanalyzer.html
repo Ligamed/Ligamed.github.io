@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LIGAMED ANALRAPIST</title>
+  <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
+
+  <style>
+  body,h1,p {margin: 16;background: #ffffff;color: black;font-family: 'Comfortaa', cursive;}
+  h1 {font-size: 20px;}
+  #bigButton {
+    background-color: green; border: none; color: black; padding: 1px; text-align: center;
+    text-decoration: none; font-size: 8px; margin: 4px 10px; height: 16px; width: 16px;
+    border-radius: 50%; outline:none; font-family: 'Open Sans', sans-serif;
+  }
+  table, th, td {border: 1px solid black; border-collapse: collapse;}
+  th, td {padding: 2px;}
+  </style>
+</head>
+<body>
+<img src="Ligamed_logo.jpg" width="600">
+<h1>LIGAMED ANALRAPIST</h1>
+<h4>THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
+<br>
+
+
+
+
+
+
+
+    <tr>
+        <td>Select a File to Load:</td>
+        <td><input type="file" id="fileToLoad"></td>
+        <td><button onclick="loadFileAsText()">Load Selected File</button><td>
+    </tr>
+
+<p id="temparray"></p>
+
+
+
+
+
+</body>
+<script type="text/javascript">
+
+function loadFileAsText()
+{	var inputArray = []
+    var fileToLoad = document.getElementById("fileToLoad").files[0];
+ 
+    var fileReader = new FileReader();
+    fileReader.onload = function(fileLoadedEvent) 
+    {
+        var textFromFileLoaded = fileLoadedEvent.target.result;
+        inputArray = textFromFileLoaded;
+        var j = []
+        fullArray = []
+        for (var i = inputArray.length - 1; i >= 0; i--) {
+        	
+        	if (inputArray[i] == ";") {
+        		fullArray.push(j);
+        		var j = []
+        		}
+        	else {j.push(inputArray[i])}
+
+        }
+    console.log(fullArray)
+    document.getElementById("temparray").innerHTML = fullArray;
+    };
+    fileReader.readAsText(fileToLoad, "UTF-8");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</html>
