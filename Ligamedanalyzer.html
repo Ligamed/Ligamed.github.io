@@ -1,5 +1,4 @@
 <!DOCTYPE HTML>
-<!DOCTYPE html>
 <html>
 <head>
 	<title>LIGAMED ANALRAPIST</title>
@@ -24,28 +23,109 @@
 <h1>LIGAMED ANALRAPIST</h1>
 <h4>THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
+<p><button onclick="loaddatalocal()" type="button">Click to Load</button></p>
+<p><button onclick="dataClear()" type="button">Click to clear</button></p>
+<div id="result"></div>
+<br>
+<div id="trainedleftdegrees"></div>
+<div id="trainedrightdegrees"></div>
+<p>Result</p>
+
+
+</body>
+<script type="text/javascript">
+
+
+function loaddatalocal() { 
+  // Loading
+  var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
+  document.getElementById("result").innerHTML = fullArray;
+  //set up training datasets
+  var trainLeftArray = [];
+  var trainRightArray = [];
+  //sets training data to its own arrays
+  for (var i = 0; i <= fullArray.length-1; i++) {
+  	if (fullArray[i][0] == "breakleft") {
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  			if (fullArray[i][0] == "resumeleft") {j=0;}
+  			else{
+  			trainLeftArray.push(fullArray[i]);}
+  		}
+  	}
+   	if (fullArray[i][0] == "breakright") {
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  			if (fullArray[i][0] == "resumeright") {j=0;}
+  			else{
+  			trainRightArray.push(fullArray[i]);}
+  		}
+  	} 	
+  }
+  var angleMovedLeft = angleIntegrate(trainLeftArray)
+  document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
+  var angleMovedRight = angleIntegrate(trainRightArray)
+  document.getElementById("trainedrightdegrees").innerHTML = angleMovedRight;
+}
+
+function dataClear() {
+localStorage.clear()
+document.getElementById("result").innerHTML = "";
+}
+
+
+function angleIntegrate(inputArray){
+	var anglexSum = 0;
+	var angleySum = 0;
+	var anglezSum = 0;
+	var timeStart = inputArray[0][0];
+	var timeEnd = inputArray[inputArray.length-1][0]
+	for (var i = 1; i <= inputArray.length - 1; i++) {
+		anglexSum = (inputArray[i][4])*(inputArray[i][0]-inputArray[i-1][0])  + anglexSum;
+		angleySum = (inputArray[i][5])*(inputArray[i][0]-inputArray[i-1][0])  + angleySum;
+		anglezSum = (inputArray[i][6])*(inputArray[i][0]-inputArray[i-1][0])  + anglezSum;
+	}
+	var anglex = anglexSum/1000;
+;	var angley = angleySum/1000;
+	var anglez = anglezSum/1000;
+	anglex = anglex.toFixed(2);
+	angley = angley.toFixed(2);
+	anglez = anglez.toFixed(2);
+
+	return [anglex,angley,anglez]
+
+
+}
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
     <tr>
         <td>Select a File to Load:</td>
         <td><input type="file" id="fileToLoad"></td>
         <td><button onclick="loadFileAsText()">Load Selected File</button><td>
     </tr>
-
-<p id="temparray"></p>
-
-
-
-
-
-</body>
-<script type="text/javascript">
-
+    <p id="temparray"></p>
 function loadFileAsText()
 {	var inputArray = []
     var fileToLoad = document.getElementById("fileToLoad").files[0];
@@ -72,28 +152,7 @@ function loadFileAsText()
     fileReader.readAsText(fileToLoad, "UTF-8");
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 </script>
 </html>
