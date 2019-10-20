@@ -89,6 +89,9 @@
   <br>
   <br>
     <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
+    <br>
+    <br>
+    <a href="https://ligamed.github.io/Ligamedanalyzer.html">Analyze Data</a>
 </body>
 <script type = 'text/javascript'>
 
@@ -154,12 +157,8 @@ function connect() {
   }).then(function (characteristics) {
     status('Subscribing...');
     for (c in characteristics) {
-
-
       characteristics[c].addEventListener('characteristicvaluechanged', handleData);
       characteristics[c].startNotifications();
-
-      
     }
     infoBar.innerHTML = "Connected"; bigButton.style.backgroundColor = "#00ffff";
   })
@@ -274,7 +273,7 @@ initGraph2();
 function saveTextAsFile()
 {
     var textToSave = fullArray;
-    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
     var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
 
  
