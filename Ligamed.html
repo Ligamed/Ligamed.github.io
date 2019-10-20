@@ -84,7 +84,7 @@
     <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
     <br>
     <br>
-    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
+    <td><button id="breakrightbutton" style="display:none;" onclick="breakright()">Begin training roll right</button></td>
     <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
   <br>
   <br>
@@ -92,6 +92,7 @@
     <br>
     <br>
     <a href="https://ligamed.github.io/Ligamedanalyzer.html">Analyze Data</a>
+    <p><button onclick="savedatalocal()" type="button">Click to Save for Analyzer</button></p>
 </body>
 <script type = 'text/javascript'>
 
@@ -298,7 +299,7 @@ function destroyClickedElement(event)
 
 //adds array line of where training data starts/stops. also toggles training buttons on/off accordingly
 function breakleft(){
-    fullArray.push("breakleft");
+    fullArray.push(["breakleft"]);
     var x = document.getElementById("breakleftbutton");
     x.style.display = "none";
     var y = document.getElementById("resumeleftbutton");
@@ -309,9 +310,9 @@ function breakleft(){
     b.style.display = "none";
   }
 function resumeleft(){
-    fullArray.push("resumeleft");
+    fullArray.push(["resumeleft"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "block";
+    x.style.display = "none";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
@@ -321,7 +322,7 @@ function resumeleft(){
   }
 
 function breakright(){
-    fullArray.push("breakright");
+    fullArray.push(["breakright"]);
     var x = document.getElementById("breakleftbutton");
     x.style.display = "none";
     var y = document.getElementById("resumeleftbutton");
@@ -332,18 +333,20 @@ function breakright(){
     b.style.display = "block";
   }
 function resumeright(){
-    fullArray.push("resumeright");
+    fullArray.push(["resumeright"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "block";
+    x.style.display = "none";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
-    a.style.display = "block";
+    a.style.display = "none";
     var b = document.getElementById("resumerightbutton");
     b.style.display = "none";
   }
 
-
+function savedatalocal(){
+localStorage.setItem("ligamedData", JSON.stringify(fullArray));
+}
 
 
 
