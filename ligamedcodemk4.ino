@@ -2,9 +2,7 @@
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
 
-const int ledPin = 22;
-const int ledPin2 = 23;
-const int ledPin3 = 24;
+
 
  // BLE Service
 BLEService imuService("917649A0-D98E-11E5-9EEC-0002A5D5C51B"); // Custom UUID
@@ -15,9 +13,7 @@ BLECharacteristic imuCharacteristic("917649A1-D98E-11E5-9EEC-0002A5D5C51B", BLER
 long previousMillis = 0;  // last timechecked, in ms
 
 void setup() {
-  pinMode(22, OUTPUT);
-pinMode(23, OUTPUT);
-pinMode(24, OUTPUT);
+
   Serial.begin(9600);    // initialize serial communication
 
   pinMode(LED_BUILTIN, OUTPUT); // initialize the built-in LED pin to indicate when a central is connected
@@ -82,35 +78,6 @@ imuCharacteristic.setValue((byte *) &output, 36);
 void loop() {
   // wait for a BLE central
   BLEDevice central = BLE.central();
-  digitalWrite(ledPin, LOW);
-     digitalWrite(ledPin2, LOW);
-     digitalWrite(ledPin3, LOW);
-  delay(1000);          
-     digitalWrite(ledPin, LOW);
-     digitalWrite(ledPin2, LOW);
-     digitalWrite(ledPin3, HIGH);
-  delay(1000);    
-     digitalWrite(ledPin, LOW);
-     digitalWrite(ledPin2, HIGH);
-     digitalWrite(ledPin3, HIGH);
-  delay(1000);  
-       digitalWrite(ledPin, HIGH);
-       digitalWrite(ledPin2, LOW);
-       digitalWrite(ledPin3, LOW);
-  delay(1000);  
-       digitalWrite(ledPin, HIGH);
-       digitalWrite(ledPin2, LOW);
-       digitalWrite(ledPin3, HIGH);
-  delay(1000);  
-       digitalWrite(ledPin, HIGH);
-       digitalWrite(ledPin2, HIGH);
-       digitalWrite(ledPin3, LOW);
-  delay(1000);  
-
-         digitalWrite(ledPin, HIGH);
-       digitalWrite(ledPin2, HIGH);
-       digitalWrite(ledPin3, HIGH);
-  delay(1000);  
   // if a BLE central is connected to the peripheral:
   if (central) {
     Serial.print("Connected to central: ");
