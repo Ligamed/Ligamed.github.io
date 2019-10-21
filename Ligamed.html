@@ -21,6 +21,7 @@
 <body>
   <img src="Ligamed_logo.jpg" width="600">
   <p>Connect to bluetooth to begin</p>
+  <p>It is recommended to fully power off LIGAMED Device between bluetooth connections</p>
   <div style="width:95%;height:100%;border-color: white;border-style: solid;border-width: 1;">
     <div style="width:100%;height:30px;border-color: white;border-style: solid;border-width: 1;border-left:none;border-top:none;margin-top:5px;" id="status">
       <button id="bigButton" ></button><div style="display: inline-block;margin-left: 10px" id="infoBar">Click to connect LIGAMED Device</div>
@@ -51,7 +52,7 @@
     </table>
 
     <div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
-      <div id="graph1" style="height:200px;"></div>
+      <div id="graph1" style="width:1600px;height:200px;"></div>
     </div>
     <br>
     <table style="width:400px;height:120px">
@@ -76,7 +77,7 @@
     </table>
 
     <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
-      <div id="graph2" style="height:200px;"></div>
+      <div id="graph2" style="width:1600px;height:200px;"></div>
     </div>
 
   <br>
@@ -84,7 +85,7 @@
     <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
     <br>
     <br>
-    <td><button id="breakrightbutton" style="display:none;" onclick="breakright()">Begin training roll right</button></td>
+    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
     <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
   <br>
   <br>
@@ -193,7 +194,7 @@ function handleData(event) {
 
   //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
 
-  var currenttime = event.timeStamp;
+  var currenttime = event.timeStamp.toFixed(2);
   fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,";"]);
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
@@ -246,7 +247,7 @@ function initGraph1(){
 }
 function initGraph2(){
   var traceData=[];
-  var properties = ["x","y","z"];
+  var properties = ["Roll","Pitch","Yaw"];
   var i = 0;
   properties.forEach(function(key) {
     i++;
@@ -312,7 +313,7 @@ function breakleft(){
 function resumeleft(){
     fullArray.push(["resumeleft"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "none";
+    x.style.display = "block";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
@@ -335,11 +336,11 @@ function breakright(){
 function resumeright(){
     fullArray.push(["resumeright"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "none";
+    x.style.display = "block";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
-    a.style.display = "none";
+    a.style.display = "block";
     var b = document.getElementById("resumerightbutton");
     b.style.display = "none";
   }
