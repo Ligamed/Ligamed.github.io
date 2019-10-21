@@ -23,29 +23,34 @@
 <h1>LIGAMED ANALRAPIST</h1>
 <h4>THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
-<p><button onclick="loaddatalocal()" type="button">Click to Load</button></p>
+<p><button onclick="stuffEverythingHere()" type="button">Click to Load</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
 <div id="result"></div>
 <br>
 <div id="trainedleftdegrees"></div>
+<div id="trainedaverageleftdegrees"></div>
 <div id="trainedrightdegrees"></div>
+<div id="trainedaveragerightdegrees"></div>
 <p>Result</p>
 
 
 </body>
 <script type="text/javascript">
 
-
-function loaddatalocal() { 
-  // Loading
+//function that runs like... everything
+function stuffEverythingHere() { 
+  // Loads data
   var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
   document.getElementById("result").innerHTML = fullArray;
   //set up training datasets
-  var trainLeftArray = [];
-  var trainRightArray = [];
+  
+
+  var angleMovedLeft =[];
+  var angleMovedRight = [];
   //sets training data to its own arrays
   for (var i = 0; i <= fullArray.length-1; i++) {
   	if (fullArray[i][0] == "breakleft") {
+  		var trainLeftArray = [];
   		var j=1;
   		while(j==1){
   			i=1+i;
@@ -53,8 +58,10 @@ function loaddatalocal() {
   			else{
   			trainLeftArray.push(fullArray[i]);}
   		}
+  		angleMovedLeft.push(angleIntegrate(trainLeftArray));
   	}
    	if (fullArray[i][0] == "breakright") {
+  		var trainRightArray = [];
   		var j=1;
   		while(j==1){
   			i=1+i;
@@ -62,12 +69,24 @@ function loaddatalocal() {
   			else{
   			trainRightArray.push(fullArray[i]);}
   		}
+  		angleMovedRight.push(angleIntegrate(trainRightArray));
+
   	} 	
   }
-  var angleMovedLeft = angleIntegrate(trainLeftArray)
+	var averagedLeft = angleAverage(angleMovedLeft);
+	var averagedRight = angleAverage(angleMovedRight);
   document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
-  var angleMovedRight = angleIntegrate(trainRightArray)
+  document.getElementById("trainedaverageleftdegrees").innerHTML = averagedLeft;
   document.getElementById("trainedrightdegrees").innerHTML = angleMovedRight;
+  document.getElementById("trainedaveragerightdegrees").innerHTML = averagedRight;
+
+//for (var i = 0; i <= fullArray.length-1; i++) {
+//	anglesOfConcern = checkAngle(fullArray)}
+
+
+
+
+
 }
 
 function dataClear() {
@@ -95,16 +114,51 @@ function angleIntegrate(inputArray){
 	anglez = anglez.toFixed(2);
 
 	return [anglex,angley,anglez]
+}
 
+function angleAverage(inputArray){
+	var x = 0;
+	var y = 0;
+	var z = 0;
+	for (var i = 0; i <= inputArray.length - 1; i++) {
+		x = x + Number(inputArray[i][0]);
+		y = y + Number(inputArray[i][1]);
+		z = z + Number(inputArray[i][2]);
+		console.log(x)
+	}
+	x = x / inputArray.length;
+	y = y / inputArray.length;
+	z = z / inputArray.length;
+	x = x.toFixed(2);
+	y = y.toFixed(2);
+	z = z.toFixed(2);
+	console.log([x,y,z])
+	return [x,y,z];
+}
+/*
+function checkAngle(inputArray){
+	var anglexSum = 0;
+	var angleySum = 0;
+	var anglezSum = 0;
+	var timeStart = inputArray[0][0];
+	var timeEnd = inputArray[inputArray.length-1][0]
+	for (var i = 1; i <= inputArray.length - 1; i++) {
+		anglexSum = (inputArray[i][4])*(inputArray[i][0]-inputArray[i-1][0])  + anglexSum;
+		angleySum = (inputArray[i][5])*(inputArray[i][0]-inputArray[i-1][0])  + angleySum;
+		anglezSum = (inputArray[i][6])*(inputArray[i][0]-inputArray[i-1][0])  + anglezSum;
+	}
+	var anglex = anglexSum/1000;
+;	var angley = angleySum/1000;
+	var anglez = anglezSum/1000;
+	anglex = anglex.toFixed(2);
+	angley = angley.toFixed(2);
+	anglez = anglez.toFixed(2);
 
+	return [anglex,angley,anglez]
 }
 
 
-
-
-
-
-
+*/
 
 
 
