@@ -43,7 +43,7 @@
 var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 function stuffEverythingHere() { 
   // Loads data
-  //document.getElementById("result").innerHTML = fullArray;
+  document.getElementById("result").innerHTML = fullArray;
   //set up training datasets
   
 
@@ -84,10 +84,6 @@ function stuffEverythingHere() {
 
 //for (var i = 0; i <= fullArray.length-1; i++) {
 //	anglesOfConcern = checkAngle(fullArray)}
-
-
-
-
 
 }
 /*
@@ -160,7 +156,6 @@ function checkAngle(inputArray){
 
 */
 
-
 function saveTextAsFile()
 {
  /*   var textToSave = fullArray;
@@ -187,7 +182,6 @@ headingsArray.push(["TimeStamp","x","y","z","Roll","Pitch","Yaw"]);
 headingsArray.reverse();
 
 
-document.getElementById("result").innerHTML = headingsArray;
 let csvContent = "data:text/csv;charset=utf-8," 
     + headingsArray.map(e => e.join(",")).join("\n");
 var encodedUri = encodeURI(csvContent);
@@ -201,15 +195,6 @@ document.body.appendChild(link); // Required for FF
 link.click(); // This will download the data file named "my_data.csv".
 
 }
-
-
-
-
-
-
-
-
-
 
 /*
 
