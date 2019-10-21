@@ -298,7 +298,7 @@ headingsArray.push(["TimeStamp","x","y","z","Roll","Pitch","Yaw"]);
 headingsArray.reverse();
 
 
-document.getElementById("result").innerHTML = headingsArray;
+
 let csvContent = "data:text/csv;charset=utf-8," 
     + headingsArray.map(e => e.join(",")).join("\n");
 var encodedUri = encodeURI(csvContent);
