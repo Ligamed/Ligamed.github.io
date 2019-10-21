@@ -32,16 +32,18 @@
 <div id="trainedrightdegrees"></div>
 <div id="trainedaveragerightdegrees"></div>
 <p>Result</p>
-
+<td><button onclick="saveTextAsFile()">Save Data to File</button></td>
 
 </body>
 <script type="text/javascript">
 
 //function that runs like... everything
+
+
+var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 function stuffEverythingHere() { 
   // Loads data
-  var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
-  document.getElementById("result").innerHTML = fullArray;
+  //document.getElementById("result").innerHTML = fullArray;
   //set up training datasets
   
 
@@ -88,12 +90,12 @@ function stuffEverythingHere() {
 
 
 }
-
+/*
 function dataClear() {
 localStorage.clear()
 document.getElementById("result").innerHTML = "";
 }
-
+*/
 
 function angleIntegrate(inputArray){
 	var anglexSum = 0;
@@ -124,7 +126,6 @@ function angleAverage(inputArray){
 		x = x + Number(inputArray[i][0]);
 		y = y + Number(inputArray[i][1]);
 		z = z + Number(inputArray[i][2]);
-		console.log(x)
 	}
 	x = x / inputArray.length;
 	y = y / inputArray.length;
@@ -132,7 +133,6 @@ function angleAverage(inputArray){
 	x = x.toFixed(2);
 	y = y.toFixed(2);
 	z = z.toFixed(2);
-	console.log([x,y,z])
 	return [x,y,z];
 }
 /*
@@ -161,7 +161,46 @@ function checkAngle(inputArray){
 */
 
 
+function saveTextAsFile()
+{
+ /*   var textToSave = fullArray;
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
 
+ 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = "Ligamed";
+    downloadLink.innerHTML = "Download File";
+    downloadLink.href = textToSaveAsURL;
+    downloadLink.onclick = destroyClickedElement;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+ 
+    downloadLink.click();
+
+    let csvContent = "data:text/csv;charset=utf-8," 
+    + fullArray.map(e => e.join(",")).join("\n");
+*/
+var headingsArray = fullArray;
+headingsArray.reverse();
+headingsArray.push(["TimeStamp","x","y","z","Roll","Pitch","Yaw"]);
+headingsArray.reverse();
+
+
+document.getElementById("result").innerHTML = headingsArray;
+let csvContent = "data:text/csv;charset=utf-8," 
+    + headingsArray.map(e => e.join(",")).join("\n");
+var encodedUri = encodeURI(csvContent);
+window.open(encodedUri);
+var encodedUri = encodeURI(csvContent);
+var link = document.createElement("a");
+link.setAttribute("href", encodedUri);
+link.setAttribute("download", "ligamed_Data.csv");
+document.body.appendChild(link); // Required for FF
+
+link.click(); // This will download the data file named "my_data.csv".
+
+}
 
 
 
