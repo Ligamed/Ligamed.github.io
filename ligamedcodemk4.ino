@@ -60,9 +60,9 @@ IMU.readGyroscope(eulers[3], eulers[4], eulers[5]);
 output[0] = round(eulers[0]*1000);
 output[1] = round(eulers[1]*1000);
 output[2] = round(eulers[2]*1000);
-output[3] = round(eulers[3]);
-output[4] = round(eulers[4]);
-output[5] = round(eulers[5]);
+output[3] = round(eulers[3]*10);
+output[4] = round(eulers[4]*10);
+output[5] = round(eulers[5]*10);
 
 for(int i=0;i<=5;i++){
   if (output[i]>32000){output[i] = 32000;}
