@@ -27,12 +27,21 @@
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
 <div id="result"></div>
 <br>
+<p>All left training, averaged left training, all right training, averaged right training, all data with mag. of acc.</p>	
 <div id="trainedleftdegrees"></div>
 <div id="trainedaverageleftdegrees"></div>
 <div id="trainedrightdegrees"></div>
 <div id="trainedaveragerightdegrees"></div>
+<div id="AkshaysVariable"></div>
 <p>Result</p>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
+   <br>
+   <tr>
+        <td>Select a File to Load:</td>
+        <td><input type="file" id="fileToLoad"></td>
+        <td><button onclick="loadFileAsText()">Load Selected File</button><td>
+    </tr>
+    <p id="temparray"></p>
 
 </body>
 <script type="text/javascript">
@@ -40,9 +49,11 @@
 //function that runs like... everything
 
 
-var fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
+
 function stuffEverythingHere() { 
   // Loads data
+  fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
+  //fullArray = csv2array(fullArray,',');
   document.getElementById("result").innerHTML = fullArray;
   //set up training datasets
   
@@ -73,25 +84,30 @@ function stuffEverythingHere() {
   		}
   		angleMovedRight.push(angleIntegrate(trainRightArray));
 
+  	
   	} 	
   }
+	for (var i = 0; i <= fullArray.length-1; i++) {
+		fullArray[i][7] = (accMagnitude(fullArray[i][2],fullArray[i][3],fullArray[i][4]));	
+
+	}
 	var averagedLeft = angleAverage(angleMovedLeft);
 	var averagedRight = angleAverage(angleMovedRight);
+	fullArray = checkAngle(fullArray);
   document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
   document.getElementById("trainedaverageleftdegrees").innerHTML = averagedLeft;
   document.getElementById("trainedrightdegrees").innerHTML = angleMovedRight;
   document.getElementById("trainedaveragerightdegrees").innerHTML = averagedRight;
+  document.getElementById("AkshaysVariable").innerHTML = fullArray;
 
-//for (var i = 0; i <= fullArray.length-1; i++) {
-//	anglesOfConcern = checkAngle(fullArray)}
 
 }
-/*
+
 function dataClear() {
 localStorage.clear()
 document.getElementById("result").innerHTML = "";
 }
-*/
+
 
 function angleIntegrate(inputArray){
 	var anglexSum = 0;
@@ -131,106 +147,178 @@ function angleAverage(inputArray){
 	z = z.toFixed(2);
 	return [x,y,z];
 }
-/*
+
+
+//Akshay is helping
+function accMagnitude(x,y,z){
+	var m = 0;
+	x = Math.pow(x,2);
+	y = Math.pow(y,2);
+	z = Math.pow(z,2);
+	m = Math.sqrt((x+y+z));
+	return m;
+
+}
+
 function checkAngle(inputArray){
-	var anglexSum = 0;
-	var angleySum = 0;
-	var anglezSum = 0;
-	var timeStart = inputArray[0][0];
-	var timeEnd = inputArray[inputArray.length-1][0]
-	for (var i = 1; i <= inputArray.length - 1; i++) {
-		anglexSum = (inputArray[i][4])*(inputArray[i][0]-inputArray[i-1][0])  + anglexSum;
-		angleySum = (inputArray[i][5])*(inputArray[i][0]-inputArray[i-1][0])  + angleySum;
-		anglezSum = (inputArray[i][6])*(inputArray[i][0]-inputArray[i-1][0])  + anglezSum;
+	for (var i = 100; i <= inputArray.length - 1; i++) {
+		var j = i;
+		var x = 0;
+		var y = 0;
+		var z = 0;
+		
+		while (inputArray[i][0] - inputArray[j][0] <= 1000){
+			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			j = j - 1;
+		}
+		x = x.toFixed(2);
+		y = y.toFixed(2);
+		z = z.toFixed(2);
+		inputArray[i][8] = x;
+		inputArray[i][9] = y;
+		inputArray[i][10] = z;
 	}
-	var anglex = anglexSum/1000;
-;	var angley = angleySum/1000;
-	var anglez = anglezSum/1000;
-	anglex = anglex.toFixed(2);
-	angley = angley.toFixed(2);
-	anglez = anglez.toFixed(2);
+	return inputArray
 
-	return [anglex,angley,anglez]
 }
 
 
-*/
-
-function saveTextAsFile()
-{
- /*   var textToSave = fullArray;
-    var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
-    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-
- 
-    var downloadLink = document.createElement("a");
-    downloadLink.download = "Ligamed";
-    downloadLink.innerHTML = "Download File";
-    downloadLink.href = textToSaveAsURL;
-    downloadLink.onclick = destroyClickedElement;
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
- 
-    downloadLink.click();
-
-    let csvContent = "data:text/csv;charset=utf-8," 
-    + fullArray.map(e => e.join(",")).join("\n");
-*/
-var headingsArray = fullArray;
-headingsArray.reverse();
-headingsArray.push(["TimeStamp","x","y","z","Roll","Pitch","Yaw"]);
-headingsArray.reverse();
 
 
-let csvContent = "data:text/csv;charset=utf-8," 
-    + headingsArray.map(e => e.join(",")).join("\n");
-var encodedUri = encodeURI(csvContent);
-window.open(encodedUri);
-var encodedUri = encodeURI(csvContent);
-var link = document.createElement("a");
-link.setAttribute("href", encodedUri);
-link.setAttribute("download", "ligamed_Data.csv");
-document.body.appendChild(link); // Required for FF
+function saveTextAsFile(){
+	var headingsArray = fullArray;
+	headingsArray.reverse();
+	headingsArray.push(["TimeStamp","x","y","z","RollVel","PitchVel","YawVel","Acc Mag","Roll","Pitch","Yaw"]);
+	headingsArray.reverse();
 
-link.click(); // This will download the data file named "my_data.csv".
+
+	let csvContent = "data:text/csv;charset=utf-8," 
+   		 + headingsArray.map(e => e.join(",")).join("\n");
+	var encodedUri = encodeURI(csvContent);
+	window.open(encodedUri);
+	var encodedUri = encodeURI(csvContent);
+	var link = document.createElement("a");
+	link.setAttribute("href", encodedUri);
+	link.setAttribute("download", "ligamed_Data.csv");
+	document.body.appendChild(link); // Required for FF
+
+	link.click(); // This will download the data file named "ligamed_data.csv".
 
 }
 
 /*
 
-    <tr>
-        <td>Select a File to Load:</td>
-        <td><input type="file" id="fileToLoad"></td>
-        <td><button onclick="loadFileAsText()">Load Selected File</button><td>
-    </tr>
-    <p id="temparray"></p>
 function loadFileAsText()
-{	var inputArray = []
+{
     var fileToLoad = document.getElementById("fileToLoad").files[0];
  
     var fileReader = new FileReader();
     fileReader.onload = function(fileLoadedEvent) 
     {
-        var textFromFileLoaded = fileLoadedEvent.target.result;
-        inputArray = textFromFileLoaded;
-        var j = []
-        fullArray = []
-        for (var i = inputArray.length - 1; i >= 0; i--) {
-        	
-        	if (inputArray[i] == ";") {
-        		fullArray.push(j);
-        		var j = []
-        		}
-        	else {j.push(inputArray[i])}
-
-        }
-    console.log(fullArray)
-    document.getElementById("temparray").innerHTML = fullArray;
+        fullArray = fileLoadedEvent.target.result;
+        localStorage.setItem("ligamedData", JSON.stringify(fullArray));
     };
     fileReader.readAsText(fileToLoad, "UTF-8");
 }
 
-*/
+//http://www.speqmath.com/tutorials/csv2array/
+function csv2array(data, delimeter) {
+  // Retrieve the delimeter
+  if (delimeter == undefined) 
+    delimeter = ',';
+  if (delimeter && delimeter.length > 1)
+    delimeter = ',';
 
+  // initialize variables
+  var newline = '\n';
+  var eof = '';
+  var i = 0;
+  var c = data.charAt(i);
+  var row = 0;
+  var col = 0;
+  var array = new Array();
+
+  while (c != eof) {
+    // skip whitespaces
+    while (c == ' ' || c == '\t' || c == '\r') {
+      c = data.charAt(++i); // read next char
+    }
+    
+    // get value
+    var value = "";
+    if (c == '\"') {
+      // value enclosed by double-quotes
+      c = data.charAt(++i);
+      
+      do {
+        if (c != '\"') {
+          // read a regular character and go to the next character
+          value += c;
+          c = data.charAt(++i);
+        }
+        
+        if (c == '\"') {
+          // check for escaped double-quote
+          var cnext = data.charAt(i+1);
+          if (cnext == '\"') {
+            // this is an escaped double-quote. 
+            // Add a double-quote to the value, and move two characters ahead.
+            value += '\"';
+            i += 2;
+            c = data.charAt(i);
+          }
+        }
+      }
+      while (c != eof && c != '\"');
+      
+      if (c == eof) {
+        throw "Unexpected end of data, double-quote expected";
+      }
+
+      c = data.charAt(++i);
+    }
+    else {
+      // value without quotes
+      while (c != eof && c != delimeter && c!= newline && c != ' ' && c != '\t' && c != '\r') {
+        value += c;
+        c = data.charAt(++i);
+      }
+    }
+
+    // add the value to the array
+    if (array.length <= row) 
+      array.push(new Array());
+    array[row].push(value);
+    
+    // skip whitespaces
+    while (c == ' ' || c == '\t' || c == '\r') {
+      c = data.charAt(++i);
+    }
+
+    // go to the next row or column
+    if (c == delimeter) {
+      // to the next column
+      col++;
+    }
+    else if (c == newline) {
+      // to the next row
+      col = 0;
+      row++;
+    }
+    else if (c != eof) {
+      // unexpected character
+
+    }
+    
+    // go to the next character
+    c = data.charAt(++i);
+  }  
+  
+  return array;
+}
+
+*/
 </script>
 </html>
