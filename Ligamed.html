@@ -272,44 +272,24 @@ initGraph1();
 initGraph2();
 
 //saves data to a file
-function saveTextAsFile()
-{
- /*   var textToSave = fullArray;
-    var textToSaveAsBlob = new Blob([textToSave], {type:"text/csv"});
-    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-
- 
-    var downloadLink = document.createElement("a");
-    downloadLink.download = "Ligamed";
-    downloadLink.innerHTML = "Download File";
-    downloadLink.href = textToSaveAsURL;
-    downloadLink.onclick = destroyClickedElement;
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
- 
-    downloadLink.click();
-
-    let csvContent = "data:text/csv;charset=utf-8," 
-    + fullArray.map(e => e.join(",")).join("\n");
-*/
-var headingsArray = fullArray;
-headingsArray.reverse();
-headingsArray.push(["TimeStamp","x","y","z","Roll","Pitch","Yaw"]);
-headingsArray.reverse();
+function saveTextAsFile(){
+  var headingsArray = fullArray;
+  headingsArray.reverse();
+  headingsArray.push(["TimeStamp","x","y","z","RollVel","PitchVel","YawVel","Acc Mag","Roll","Pitch","Yaw"]);
+  headingsArray.reverse();
 
 
+  let csvContent = "data:text/csv;charset=utf-8," 
+       + headingsArray.map(e => e.join(",")).join("\n");
+  var encodedUri = encodeURI(csvContent);
+  window.open(encodedUri);
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "ligamed_Data.csv");
+  document.body.appendChild(link); // Required for FF
 
-let csvContent = "data:text/csv;charset=utf-8," 
-    + headingsArray.map(e => e.join(",")).join("\n");
-var encodedUri = encodeURI(csvContent);
-window.open(encodedUri);
-var encodedUri = encodeURI(csvContent);
-var link = document.createElement("a");
-link.setAttribute("href", encodedUri);
-link.setAttribute("download", "ligamed_Data.csv");
-document.body.appendChild(link); // Required for FF
-
-link.click(); // This will download the data file named "my_data.csv".
+  link.click(); // This will download the data file named "ligamed_data.csv".
 
 }
 
