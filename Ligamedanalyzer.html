@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>LIGAMED ANALRAPIST</title>
+	<title>LIGAMED ANALYZER</title>
   <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
@@ -16,14 +16,24 @@
   }
   table, th, td {border: 1px solid black; border-collapse: collapse;}
   th, td {padding: 2px;}
+  .runbutton {
+  	background-color: #4CAF50;
+  	border: none;
+ 	color: white;
+  	padding: 0px 0px;
+  	text-align: center;
+  	font-size: 0px;
+  	cursor: pointer;
+	}
   </style>
 </head>
 <body>
-<img src="Ligamed_logo.jpg" width="600">
-<h1>LIGAMED ANALRAPIST</h1>
-<h4>THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
+<p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo.jpg" width="600"> </button></p>
+<h1 id="line1" style = "display:none">LIGAMED ANALRAPIST</h1>
+<h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
-<p><button onclick="stuffEverythingHere()" type="button">Click to Load</button></p>
+<p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
+<p><button onclick="stuffEverythingHere()" type="button">Click Run</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
 <div id="result"></div>
 <br>
@@ -36,6 +46,7 @@
 <p>Result</p>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
+   <br>
    <tr>
         <td>Select a File to Load:</td>
         <td><input type="file" id="fileToLoad"></td>
@@ -46,14 +57,16 @@
 </body>
 <script type="text/javascript">
 
+
+
+function loadLocalData(){
+fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
+document.getElementById("result").innerHTML = fullArray;
+}
+
 //function that runs like... everything
-
-
-
 function stuffEverythingHere() { 
   // Loads data
-  fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
-  //fullArray = csv2array(fullArray,',');
   document.getElementById("result").innerHTML = fullArray;
   //set up training datasets
   
@@ -108,6 +121,8 @@ localStorage.clear()
 document.getElementById("result").innerHTML = "";
 }
 
+
+//computation functions below
 
 function angleIntegrate(inputArray){
 	var anglexSum = 0;
@@ -187,6 +202,26 @@ function checkAngle(inputArray){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Utility functions below
+
 function saveTextAsFile(){
 	var headingsArray = fullArray;
 	headingsArray.reverse();
@@ -208,8 +243,22 @@ function saveTextAsFile(){
 
 }
 
-/*
+function runData(){
+	var x = document.getElementById("line1");
+    var y = document.getElementById("line2");
+    if (x.style.display === "none") {
+    	x.style.display = "block";
+    	y.style.display = "block";
+    }
+    else {
+    x.style.display = "none";
+    y.style.display = "none";
+    }
 
+}
+
+
+//loads csv file that has been saved from either page earlier
 function loadFileAsText()
 {
     var fileToLoad = document.getElementById("fileToLoad").files[0];
@@ -217,13 +266,17 @@ function loadFileAsText()
     var fileReader = new FileReader();
     fileReader.onload = function(fileLoadedEvent) 
     {
-        fullArray = fileLoadedEvent.target.result;
-        localStorage.setItem("ligamedData", JSON.stringify(fullArray));
+        var uploadArray = fileLoadedEvent.target.result;
+        fullArray = csv2array(uploadArray,',');
+        fullArray.reverse();
+        fullArray.pop()
+        fullArray.reverse();
     };
     fileReader.readAsText(fileToLoad, "UTF-8");
 }
 
-//http://www.speqmath.com/tutorials/csv2array/
+//http://www.speqmath.com/tutorials/csv2array/ 
+//Shamelessly borrowed. Probably could have been edited down, but it's working and I don't want to break things
 function csv2array(data, delimeter) {
   // Retrieve the delimeter
   if (delimeter == undefined) 
@@ -319,6 +372,6 @@ function csv2array(data, delimeter) {
   return array;
 }
 
-*/
+
 </script>
 </html>
