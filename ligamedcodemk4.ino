@@ -1,7 +1,9 @@
 
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
-
+const int ledPin = 22;
+const int ledPin2 = 23;
+const int ledPin3 = 24;
 
 
  // BLE Service
@@ -13,6 +15,12 @@ BLECharacteristic imuCharacteristic("917649A1-D98E-11E5-9EEC-0002A5D5C51B", BLER
 long previousMillis = 0;  // last timechecked, in ms
 
 void setup() {
+  pinMode(22, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(24, OUTPUT);
+  digitalWrite(ledPin, HIGH); //red light
+  digitalWrite(ledPin2, LOW);
+  digitalWrite(ledPin3, HIGH);
 
   Serial.begin(9600);    // initialize serial communication
 
@@ -23,13 +31,6 @@ void setup() {
     Serial.println("Failed to initialize IMU!");
     while (1);
   }
-
-  Serial.print("Euler Angles sample rate = ");
-  //Serial.print(IMU.eulerAnglesSampleRate());
-  Serial.println(" Hz");
-  Serial.println();
-  Serial.println("Euler Angles in degrees");
-  Serial.println("X\tY\tZ");
   
   if (!BLE.begin()) {
     Serial.println("starting BLE failed!");
@@ -44,7 +45,6 @@ void setup() {
   
   // start advertising
   BLE.advertise();
-  Serial.println("Bluetooth device active, waiting for connections...");
 }
 
 
@@ -70,7 +70,7 @@ for(int i=0;i<=5;i++){
 }
 
 
-// Send 3x eulers over bluetooth as 1x byte array 
+// Send 6x variables over bluetooth as 1x byte array 
 imuCharacteristic.setValue((byte *) &output, 36); 
 
 } 
@@ -80,12 +80,13 @@ void loop() {
   BLEDevice central = BLE.central();
   // if a BLE central is connected to the peripheral:
   if (central) {
-    Serial.print("Connected to central: ");
-    // print the central's BT address:
-    Serial.println(central.address());
-    // turn on the LED to indicate the connection:
-    digitalWrite(LED_BUILTIN, HIGH);
 
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(ledPin, HIGH); //blue light
+    digitalWrite(ledPin2, HIGH);
+    digitalWrite(ledPin3, LOW);
+
+    
     // while the central is connected:
     while (central.connected()) {
       long currentMillis = millis();
@@ -99,7 +100,9 @@ void loop() {
     }
     // when the central disconnects, turn off the LED:
     digitalWrite(LED_BUILTIN, LOW);
-    Serial.print("Disconnected from central: ");
-    Serial.println(central.address());
+    digitalWrite(ledPin, LOW);
+    digitalWrite(ledPin2, HIGH);
+    digitalWrite(ledPin3, HIGH);
+
   }
 }
