@@ -35,14 +35,14 @@
 <p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
 <p><button onclick="stuffEverythingHere()" type="button">Click Run</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
-<div id="result"></div>
+
 <br>
-<p>All left training, averaged left training, all right training, averaged right training, all data with mag. of acc.</p>	
+<p>All left training, averaged left training, all right training, averaged right training</p>	
 <div id="trainedleftdegrees"></div>
 <div id="trainedaverageleftdegrees"></div>
 <div id="trainedrightdegrees"></div>
 <div id="trainedaveragerightdegrees"></div>
-<div id="AkshaysVariable"></div>
+
 <p>Result</p>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
@@ -54,25 +54,38 @@
     </tr>
     <p id="temparray"></p>
 
+<p><button onclick="togglegraph()" type="button">Click for Graphs</button></p>
+<div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph1" style="width:1400px;height:200px;"></div>
+</div>
+
+<p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
+<div id="longTable" style="display:none;"></div>
+
+
+
+
+
+
 </body>
 <script type="text/javascript">
 
 
+var magAcc = [];
+var magAccTime = [];
 
 function loadLocalData(){
 fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
-document.getElementById("result").innerHTML = fullArray;
 }
 
 //function that runs like... everything
 function stuffEverythingHere() { 
   // Loads data
-  document.getElementById("result").innerHTML = fullArray;
-  //set up training datasets
-  
 
+  //set up training datasets
   var angleMovedLeft =[];
   var angleMovedRight = [];
+
   //sets training data to its own arrays
   for (var i = 0; i <= fullArray.length-1; i++) {
   	if (fullArray[i][0] == "breakleft") {
@@ -100,20 +113,48 @@ function stuffEverythingHere() {
   	
   	} 	
   }
+  	
+  	//gets mag. of acceleration
 	for (var i = 0; i <= fullArray.length-1; i++) {
-		fullArray[i][7] = (accMagnitude(fullArray[i][2],fullArray[i][3],fullArray[i][4]));	
-
+		fullArray[i][7] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
+		magAcc[i] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
+		magAccTime[i] = fullArray[i][0];
 	}
 	var averagedLeft = angleAverage(angleMovedLeft);
 	var averagedRight = angleAverage(angleMovedRight);
 	fullArray = checkAngle(fullArray);
+
   document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
   document.getElementById("trainedaverageleftdegrees").innerHTML = averagedLeft;
   document.getElementById("trainedrightdegrees").innerHTML = angleMovedRight;
   document.getElementById("trainedaveragerightdegrees").innerHTML = averagedRight;
-  document.getElementById("AkshaysVariable").innerHTML = fullArray;
+
+initGraph1();
 
 
+//adds table
+		var headingsArray = fullArray;
+		headingsArray.reverse();
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw"]);
+		headingsArray.reverse();
+		var tableArr = headingsArray
+		//create a Table Object
+		let table = document.createElement('table');
+		//iterate over every array(row) within tableArr
+		for (let row of tableArr) {
+		//Insert a new row element into the table element
+		  table.insertRow();
+		//Iterate over every index(cell) in each array(row)
+		  for (let cell of row) {
+		//While iterating over the index(cell)
+		//insert a cell into the table element
+		    let newCell = table.rows[table.rows.length - 1].insertCell();
+		//add text to the created cell element
+		    newCell.textContent = cell;
+		  }
+		}
+		//append the compiled table to the DOM
+		document.getElementById("longTable").appendChild(table);
 }
 
 function dataClear() {
@@ -171,6 +212,7 @@ function accMagnitude(x,y,z){
 	y = Math.pow(y,2);
 	z = Math.pow(z,2);
 	m = Math.sqrt((x+y+z));
+	m = m.toFixed(2);
 	return m;
 
 }
@@ -208,6 +250,21 @@ function checkAngle(inputArray){
 
 
 
+//Output functions
+
+//magnitude graph
+function initGraph1(){
+	var trace1 = {
+		x: magAccTime, 
+		y: magAcc,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph1', trace,
+  {
+
+  });
+}
 
 
 
@@ -221,11 +278,27 @@ function checkAngle(inputArray){
 
 
 //Utility functions below
+function togglegraph() {
+  var x = document.getElementById("graph1box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+function toggleTable() {
+  var x = document.getElementById("longTable");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
 
 function saveTextAsFile(){
 	var headingsArray = fullArray;
 	headingsArray.reverse();
-	headingsArray.push(["TimeStamp","x","y","z","RollVel","PitchVel","YawVel","Acc Mag","Roll","Pitch","Yaw"]);
+	headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
 	headingsArray.reverse();
 
 
