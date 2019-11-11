@@ -29,7 +29,7 @@
 </head>
 <body>
 <p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo.jpg" width="600"> </button></p>
-<h1 id="line1" style = "display:none">LIGAMED Therapist</h1>
+<h1 id="line1" style = "display:none">LIGAMED ANALRAPIST</h1>
 <h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
 <p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
@@ -55,9 +55,37 @@
     <p id="temparray"></p>
 
 <p><button onclick="togglegraph()" type="button">Click for Graphs</button></p>
-<div id="graph1box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph1" style="width:1400px;height:200px;"></div>
+<div id="graph1box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph1" style="width:1400px;height:400px;"></div>
 </div>
+<div id="graph2box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph2" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph3box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph3" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph4box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph4" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph5box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph5" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph6box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph6" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph7box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph7" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph8box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph8" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph9box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph9" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph10box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph10" style="width:1400px;height:400px;"></div>
+</div>
+
 
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
 <div id="longTable" style="display:none;"></div>
@@ -71,8 +99,20 @@
 <script type="text/javascript">
 
 
+
+var overallTime = [];
+var accX = [];
+var accY = [];
+var accZ = [];
+var velX = [];
+var velY = [];
+var velZ = [];
 var magAcc = [];
-var magAccTime = [];
+var angX = [];
+var angY = [];
+var angZ = [];
+
+
 
 function loadLocalData(){
 fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
@@ -112,17 +152,54 @@ function stuffEverythingHere() {
 
   	
   	} 	
-  }
-  	
+  } 	
   	//gets mag. of acceleration
 	for (var i = 0; i <= fullArray.length-1; i++) {
 		fullArray[i][7] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
-		magAcc[i] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
-		magAccTime[i] = fullArray[i][0];
 	}
+
 	var averagedLeft = angleAverage(angleMovedLeft);
 	var averagedRight = angleAverage(angleMovedRight);
 	fullArray = checkAngle(fullArray);
+
+ 	trimmedArray = [];
+  	//removes text and NaN's from data
+  	for (var i = 0; i <= fullArray.length-1; i++){
+  		var currentLine = []
+  		currentLine = fullArray[i];
+  		currentLine.push(0,0,0,0)
+  		var trimmedline = [0,0,0,0,0,0,0,0,0,0]
+  		for (var j = 0; j <= 10; j++) {
+
+  			if (!isNaN(currentLine[j])){
+  				trimmedline[j] = currentLine[j];
+  			}
+  			else{
+  				trimmedline[j] = 0;
+  			}
+  			
+  		}
+  		if (trimmedline[0] !=0) {trimmedArray.push(trimmedline)}
+  		
+  	}
+
+ 
+
+	for (var i = 0; i <= trimmedArray.length-1; i++) {
+		overallTime[i] = trimmedArray[i][0];
+		accX[i] = trimmedArray[i][1];
+		accY[i] = trimmedArray[i][2];
+		accZ[i] = trimmedArray[i][3];
+		velX[i] = trimmedArray[i][4];
+		velY[i] = trimmedArray[i][5];
+		velZ[i] = trimmedArray[i][6];
+		magAcc[i] = trimmedArray[i][7];
+		angX[i] = trimmedArray[i][8];
+		angY[i] = trimmedArray[i][9];
+		angZ[i] = trimmedArray[i][10];
+
+	}
+
 
   document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
   document.getElementById("trainedaverageleftdegrees").innerHTML = averagedLeft;
@@ -130,10 +207,18 @@ function stuffEverythingHere() {
   document.getElementById("trainedaveragerightdegrees").innerHTML = averagedRight;
 
 initGraph1();
-
+initGraph2();
+initGraph3();
+initGraph4();
+initGraph5();
+initGraph6();
+initGraph7();
+initGraph8();
+initGraph9();
+initGraph10();
 
 //adds table
-		var headingsArray = fullArray;
+		var headingsArray = trimmedArray;
 		headingsArray.reverse();
 		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw"]);
 		headingsArray.reverse();
@@ -157,10 +242,9 @@ initGraph1();
 		document.getElementById("longTable").appendChild(table);
 }
 
-function dataClear() {
-localStorage.clear()
-document.getElementById("result").innerHTML = "";
-}
+//function dataClear() {
+//localStorage.clear()
+//document.getElementById("result").innerHTML = "";}
 
 
 //computation functions below
@@ -252,18 +336,96 @@ function checkAngle(inputArray){
 
 //Output functions
 
-//magnitude graph
+//graph
 function initGraph1(){
 	var trace1 = {
-		x: magAccTime, 
+		x: overallTime, 
+		y: accX,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph1', trace,);
+}
+function initGraph2(){
+	var trace1 = {
+		x: overallTime, 
+		y: accY,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph2', trace,);
+}
+function initGraph3(){
+	var trace1 = {
+		x: overallTime, 
+		y: accZ,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph3', trace,);
+}
+function initGraph4(){
+	var trace1 = {
+		x: overallTime, 
+		y: velX,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph4', trace,);
+}
+function initGraph5(){
+	var trace1 = {
+		x: overallTime, 
+		y: velY,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph5', trace,);
+}
+function initGraph6(){
+	var trace1 = {
+		x: overallTime, 
+		y: velZ,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph6', trace,);
+}
+function initGraph7(){
+	var trace1 = {
+		x: overallTime, 
 		y: magAcc,
 		mode: 'scatter'
 		};
 	var trace = [trace1]
-  	Plotly.plot('graph1', trace,
-  {
-
-  });
+  	Plotly.plot('graph7', trace,);
+}
+function initGraph8(){
+	var trace1 = {
+		x: overallTime, 
+		y: angX,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph8', trace,);
+}
+function initGraph9(){
+	var trace1 = {
+		x: overallTime, 
+		y: angY,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph9', trace,);
+}
+function initGraph10(){
+	var trace1 = {
+		x: overallTime, 
+		y: angZ,
+		mode: 'scatter'
+		};
+	var trace = [trace1]
+  	Plotly.plot('graph10', trace,);
 }
 
 
@@ -285,7 +447,64 @@ function togglegraph() {
   } else {
     x.style.display = "none";
   }
+  var x = document.getElementById("graph2box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph3box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph4box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph5box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph6box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph7box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph8box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph9box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  var x = document.getElementById("graph10box");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+
 }
+
+
 function toggleTable() {
   var x = document.getElementById("longTable");
   if (x.style.display === "none") {
