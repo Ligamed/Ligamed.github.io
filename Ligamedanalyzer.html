@@ -29,21 +29,17 @@
 </head>
 <body>
 <p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo.jpg" width="600"> </button></p>
-<h1 id="line1" style = "display:none">LIGAMED ANALRAPIST</h1>
+<h1 id="line1" style = "display:none">LIGAMED!</h1>
 <h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
 <p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
 <p><button onclick="stuffEverythingHere()" type="button">Click Run</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
-
 <br>
-<p>All left training, averaged left training, all right training, averaged right training</p>	
-<div id="trainedleftdegrees"></div>
-<div id="trainedaverageleftdegrees"></div>
-<div id="trainedrightdegrees"></div>
-<div id="trainedaveragerightdegrees"></div>
+<p>Max Roll</p>
+<div id="textMaxRoll"></div>
+<br>
 
-<p>Result</p>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
    <br>
@@ -54,37 +50,7 @@
     </tr>
     <p id="temparray"></p>
 
-<p><button onclick="togglegraph()" type="button">Click for Graphs</button></p>
-<div id="graph1box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph1" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph2box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph2" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph3box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph3" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph4box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph4" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph5box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph5" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph6box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph6" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph7box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph7" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph8box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph8" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph9box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph9" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph10box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph10" style="width:1400px;height:400px;"></div>
-</div>
+
 
 
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
@@ -113,61 +79,64 @@ var angY = [];
 var angZ = [];
 
 
-
+// Loads data from localdata
 function loadLocalData(){
 fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 }
 
 //function that runs like... everything
 function stuffEverythingHere() { 
-  // Loads data
 
-  //set up training datasets
-  var angleMovedLeft =[];
-  var angleMovedRight = [];
-
-  //sets training data to its own arrays
-  for (var i = 0; i <= fullArray.length-1; i++) {
-  	if (fullArray[i][0] == "breakleft") {
-  		var trainLeftArray = [];
-  		var j=1;
-  		while(j==1){
-  			i=1+i;
-  			if (fullArray[i][0] == "resumeleft") {j=0;}
-  			else{
-  			trainLeftArray.push(fullArray[i]);}
-  		}
-  		angleMovedLeft.push(angleIntegrate(trainLeftArray));
-  	}
-   	if (fullArray[i][0] == "breakright") {
-  		var trainRightArray = [];
-  		var j=1;
-  		while(j==1){
-  			i=1+i;
-  			if (fullArray[i][0] == "resumeright") {j=0;}
-  			else{
-  			trainRightArray.push(fullArray[i]);}
-  		}
-  		angleMovedRight.push(angleIntegrate(trainRightArray));
-
-  	
-  	} 	
-  } 	
   	//gets mag. of acceleration
 	for (var i = 0; i <= fullArray.length-1; i++) {
 		fullArray[i][7] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
 	}
 
-	var averagedLeft = angleAverage(angleMovedLeft);
-	var averagedRight = angleAverage(angleMovedRight);
+	 	//integrates angles
 	fullArray = checkAngle(fullArray);
 
+
+  //set up training datasets
+  var trainGAIT = [];
+  var currentGAIT = 1
+  var avgGAIT = [];
+  //sets training data to its own arrays
+  for (var i = 0; i <= fullArray.length-1; i++) {
+  	var currentGAITdata = [];
+  	if (fullArray[i][0] == "breakGAIT") {
+  		trainGAIT.push(['GAIT TRAIN ' + currentGAIT]);
+  		
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  			if (fullArray[i][0] == "resumeGAIT") {j=0;}
+  			else{
+  			trainGAIT.push(fullArray[i]);
+  			currentGAITdata.push(fullArray[i]);
+  			}
+
+  		}
+  		
+  		
+  		currentGAIT = currentGAIT + 1;
+  		avgGAIT.push(maxRoll(currentGAITdata));
+  	}
+  } 	
+
+
+
+
+	var averagedGAIT = angleAverage(avgGAIT);
+	//console.log(averagedGAIT);
+	document.getElementById("textMaxRoll").innerHTML = averagedGAIT;
+
  	trimmedArray = [];
+
   	//removes text and NaN's from data
   	for (var i = 0; i <= fullArray.length-1; i++){
   		var currentLine = []
   		currentLine = fullArray[i];
-  		currentLine.push(0,0,0,0)
+  		//currentLine.push(0,0,0,0)
   		var trimmedline = [0,0,0,0,0,0,0,0,0,0]
   		for (var j = 0; j <= 10; j++) {
 
@@ -201,11 +170,8 @@ function stuffEverythingHere() {
 	}
 
 
-  document.getElementById("trainedleftdegrees").innerHTML = angleMovedLeft;
-  document.getElementById("trainedaverageleftdegrees").innerHTML = averagedLeft;
-  document.getElementById("trainedrightdegrees").innerHTML = angleMovedRight;
-  document.getElementById("trainedaveragerightdegrees").innerHTML = averagedRight;
 
+/*
 initGraph1();
 initGraph2();
 initGraph3();
@@ -216,9 +182,10 @@ initGraph7();
 initGraph8();
 initGraph9();
 initGraph10();
+*/
 
 //adds table
-		var headingsArray = trimmedArray;
+		var headingsArray = fullArray;
 		headingsArray.reverse();
 		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw"]);
 		headingsArray.reverse();
@@ -249,6 +216,28 @@ initGraph10();
 
 //computation functions below
 
+function maxRoll(inputArray){
+	var tempRollAngle = []
+	for (var i = 0; i <= inputArray.length-1; i++) {
+		tempRollAngle.push(inputArray[i][8])
+
+	}
+
+	var maxMoved = Math.max(...tempRollAngle);
+	return(maxMoved)
+
+
+
+
+}
+
+
+
+
+
+
+/*
+//not used currently
 function angleIntegrate(inputArray){
 	var anglexSum = 0;
 	var angleySum = 0;
@@ -269,23 +258,20 @@ function angleIntegrate(inputArray){
 
 	return [anglex,angley,anglez]
 }
+*/
 
 function angleAverage(inputArray){
 	var x = 0;
-	var y = 0;
-	var z = 0;
+
 	for (var i = 0; i <= inputArray.length - 1; i++) {
-		x = x + Number(inputArray[i][0]);
-		y = y + Number(inputArray[i][1]);
-		z = z + Number(inputArray[i][2]);
+		x = x + Number(inputArray[i]);
+
 	}
 	x = x / inputArray.length;
-	y = y / inputArray.length;
-	z = z / inputArray.length;
+
 	x = x.toFixed(2);
-	y = y.toFixed(2);
-	z = z.toFixed(2);
-	return [x,y,z];
+
+	return x;
 }
 
 
@@ -302,13 +288,23 @@ function accMagnitude(x,y,z){
 }
 
 function checkAngle(inputArray){
-	for (var i = 100; i <= inputArray.length - 1; i++) {
+
+	for (var i = 50; i <= inputArray.length - 1; i++) {
+		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'){
+			i = i+1;
+		}
 		var j = i;
 		var x = 0;
 		var y = 0;
 		var z = 0;
-		
+
+
 		while (inputArray[i][0] - inputArray[j][0] <= 1000){
+			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'){
+				j = j-2;
+			}
+
+
 			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/1000;
 			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/1000;
 			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/1000;
@@ -332,7 +328,7 @@ function checkAngle(inputArray){
 
 
 
-
+/*
 
 //Output functions
 
@@ -432,7 +428,40 @@ function initGraph10(){
 
 
 
+<p><button onclick="togglegraph()" type="button">Click for Graphs</button></p>
+<div id="graph1box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph1" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph2box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph2" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph3box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph3" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph4box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph4" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph5box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph5" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph6box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph6" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph7box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph7" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph8box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph8" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph9box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph9" style="width:1400px;height:400px;"></div>
+</div>
+<div id="graph10box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
+   <div id="graph10" style="width:1400px;height:400px;"></div>
+</div>
 
+
+*/
 
 
 
