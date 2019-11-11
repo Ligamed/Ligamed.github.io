@@ -39,7 +39,10 @@
 <p>Max Roll</p>
 <div id="textMaxRoll"></div>
 <br>
-
+<p>Min Roll</p>
+<div id="textMinRoll"></div>
+<br>
+<br>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
    <br>
@@ -99,7 +102,8 @@ function stuffEverythingHere() {
   //set up training datasets
   var trainGAIT = [];
   var currentGAIT = 1
-  var avgGAIT = [];
+  var avgMaxGAIT = [];
+  var avgMinGAIT = [];
   //sets training data to its own arrays
   for (var i = 0; i <= fullArray.length-1; i++) {
   	var currentGAITdata = [];
@@ -119,16 +123,18 @@ function stuffEverythingHere() {
   		
   		
   		currentGAIT = currentGAIT + 1;
-  		avgGAIT.push(maxRoll(currentGAITdata));
+  		avgMaxGAIT.push(maxRoll(currentGAITdata));
+  		avgMinGAIT.push(minRoll(currentGAITdata));
   	}
   } 	
 
 
 
 
-	var averagedGAIT = angleAverage(avgGAIT);
-	//console.log(averagedGAIT);
-	document.getElementById("textMaxRoll").innerHTML = averagedGAIT;
+	var averagedMaxGAIT = angleAverage(avgMaxGAIT);
+	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
+	var averagedMinGAIT = angleAverage(avgMinGAIT);
+	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 
  	trimmedArray = [];
 
@@ -225,12 +231,18 @@ function maxRoll(inputArray){
 
 	var maxMoved = Math.max(...tempRollAngle);
 	return(maxMoved)
-
-
-
-
 }
 
+function minRoll(inputArray){
+	var tempRollAngle = []
+	for (var i = 0; i <= inputArray.length-1; i++) {
+		tempRollAngle.push(inputArray[i][8])
+
+	}
+
+	var minMoved = Math.min(...tempRollAngle);
+	return(minMoved)
+}
 
 
 
