@@ -42,6 +42,9 @@
 <p>Min Roll</p>
 <div id="textMinRoll"></div>
 <br>
+<p>Sprain Risk Factor</p>
+<div id="textSprain"></div>
+<br>
 <br>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
@@ -128,14 +131,15 @@ function stuffEverythingHere() {
   	}
   } 	
 
-
-
-
 	var averagedMaxGAIT = angleAverage(avgMaxGAIT);
-	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	var averagedMinGAIT = angleAverage(avgMinGAIT);
-	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 
+  	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
+
+
+	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
+	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
+	document.getElementById("textSprain").innerHTML = sprainFactor;
  	trimmedArray = [];
 
   	//removes text and NaN's from data
@@ -334,6 +338,25 @@ function checkAngle(inputArray){
 }
 
 
+//checks chance of sprain. This has taken far too long to get.
+function riskAnalysis(inputArray,min,max){
+	var countOut = 0;
+	var countIn = 0;
+
+
+	for (var i = 50; i <= inputArray.length - 1; i++) {
+		if (inputArray[i][9] > max || inputArray[i][8] < min){
+		countOut = countOut + 1;
+		}
+		else {
+			countIn = countIn + 1;
+		}
+	}
+	var percentageOut = countOut / (countIn + countOut)
+	console.log(countOut)
+	console.log(countIn)
+	return percentageOut	
+}
 
 
 
