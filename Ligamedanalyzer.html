@@ -5,7 +5,8 @@
   <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
   <style>
   body,h1,p {margin: 16;background: #ffffff;color: black;font-family: 'Comfortaa', cursive;}
   h1 {font-size: 20px;}
@@ -56,11 +57,8 @@
     </tr>
     <p id="temparray"></p>
 
-
-
-
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
-<div id="longTable" style="display:none;"></div>
+<div id="longTable" style="display:none;width:100px;height:200px;"></div>
 
 
 
@@ -83,6 +81,12 @@ var magAcc = [];
 var angX = [];
 var angY = [];
 var angZ = [];
+var isImpact = [];
+
+
+
+
+
 
 
 // Loads data from localdata
@@ -147,8 +151,8 @@ function stuffEverythingHere() {
   		var currentLine = []
   		currentLine = fullArray[i];
   		//currentLine.push(0,0,0,0)
-  		var trimmedline = [0,0,0,0,0,0,0,0,0,0]
-  		for (var j = 0; j <= 10; j++) {
+  		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0]
+  		for (var j = 0; j <= 11; j++) {
 
   			if (!isNaN(currentLine[j])){
   				trimmedline[j] = currentLine[j];
@@ -176,7 +180,7 @@ function stuffEverythingHere() {
 		angX[i] = trimmedArray[i][8];
 		angY[i] = trimmedArray[i][9];
 		angZ[i] = trimmedArray[i][10];
-
+		isImpact[i] = trimmedArray[i][11];
 	}
 
 
@@ -217,7 +221,152 @@ initGraph10();
 		}
 		//append the compiled table to the DOM
 		document.getElementById("longTable").appendChild(table);
+
+//copied from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
+var predImpact = []
+
+const Sdata = tf.tensor1d(accX);
+const Fdata = tf.tensor1d(velX);
+const Zdata = tf.tensor1d(angX);
+const Rdata = tf.tensor1d(isImpact)
+
+const a0 = tf.scalar(Math.random()).variable();
+const a1 = tf.scalar(Math.random()).variable();
+const a2 = tf.scalar(Math.random()).variable();
+const a3 = tf.scalar(Math.random()).variable();
+
+const fun = (z,r,s) => a3.mul(z).add(a2.mul(r)).add(a1.mul(s)).add(a0)
+const cost = (pred, label) => pred.sub(label).square().mean();
+
+const learningRate = 0.001;
+const optimizer = tf.train.sgd(learningRate);
+
+// Train the model.
+for (let i = 0; i < 800; i++) {
+    console.log("training")
+    optimizer.minimize(() => cost(fun(Zdata,Rdata,Sdata), Fdata));
 }
+
+console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}`);
+
+const preds = fun(Zdata,Rdata,Sdata).dataSync();
+preds.forEach((pred, i) => {
+   console.log(`x: ${i}, pred: ${pred}`,isImpact[i]);
+   fullArray[i][12] = pred
+});
+
+console.log(predImpact)
+
+
+/*
+
+trainX1 = accX
+trainX2 = velX
+trainX3 = angX
+trainY = isImpact
+
+m = tf.variable(tf.scalar(Math.random()));
+b = tf.variable(tf.scalar(Math.random()));
+
+plot();
+*/
+}
+
+/*
+function predict(x) {
+  return tf.tidy(function() {
+    return m.mul(x).add(b);
+  });
+}
+
+
+function loss(prediction, labels) {
+  //subtracts the two arrays & squares each element of the tensor then finds the mean.
+  error = prediction
+    .sub(labels)
+    .square()
+    .mean();
+  return error;
+}
+
+function train() {
+  learningRate = 0.01;
+  optimizer = tf.train.sgd(learningRate);
+
+  optimizer.minimize(function() {
+    predsYs = predict(tf.tensor1d(trainX1));
+    stepLoss = loss(predsYs, tf.tensor1d(trainY));
+    return stepLoss;
+  });
+  plot();
+}
+
+
+async function plot() {
+  let plotData = [];
+
+  for (let i = 0; i < trainY.length; i++) {
+    plotData.push({ x: trainX1[i], y: trainY[i] });
+  }
+
+  ctx = document.getElementById("myChart").getContext("2d");
+
+  scatterChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      datasets: [
+        {
+          label: "Training Data",
+          showLine: false,
+          data: plotData,
+          fill: false
+        },
+        {
+          label: "Y = " + m.dataSync()[0] + "X + " + b.dataSync()[0],
+          data: [
+            {
+              x: 0,
+              y: b.dataSync()[0]
+            },
+            {
+              x: 11,
+              y: 11 * m.dataSync()[0] + b.dataSync()[0]
+            }
+          ],
+
+          // Changes this dataset to become a line
+          type: "line",
+          borderColor: "red",
+          fill: false
+        }
+      ]
+    },
+    options: {
+      animation: false,
+      scales: {
+          yAxes: [
+           {
+              ticks: {
+                max: 5
+              }
+            }
+          ],
+        xAxes: [
+          {
+            type: "linear",
+            position: "bottom"
+          }
+        ]
+      }
+    }
+  });
+}
+
+
+
+
+*/
+
 
 //function dataClear() {
 //localStorage.clear()
@@ -306,7 +455,7 @@ function accMagnitude(x,y,z){
 function checkAngle(inputArray){
 
 	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'){
+		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep'){
 			i = i+1;
 		}
 		var j = i;
@@ -316,7 +465,9 @@ function checkAngle(inputArray){
 
 
 		while (inputArray[i][0] - inputArray[j][0] <= 1000){
-			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'){
+			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'
+				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep'
+				){
 				j = j-2;
 			}
 
@@ -353,8 +504,6 @@ function riskAnalysis(inputArray,min,max){
 		}
 	}
 	var percentageOut = countOut / (countIn + countOut)
-	console.log(countOut)
-	console.log(countIn)
 	return percentageOut	
 }
 
@@ -580,9 +729,9 @@ function toggleTable() {
 
 function saveTextAsFile(){
 	var headingsArray = fullArray;
-	headingsArray.reverse();
-	headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
-	headingsArray.reverse();
+	//headingsArray.reverse();
+	//headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
+	//headingsArray.reverse();
 
 
 	let csvContent = "data:text/csv;charset=utf-8," 
@@ -699,6 +848,7 @@ function csv2array(data, delimeter) {
     // add the value to the array
     if (array.length <= row) 
       array.push(new Array());
+  		value = Number(value); //Zach added this to try to fix the load
     array[row].push(value);
     
     // skip whitespaces
