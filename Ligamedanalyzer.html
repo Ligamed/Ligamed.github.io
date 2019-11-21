@@ -151,8 +151,8 @@ function stuffEverythingHere() {
   		var currentLine = []
   		currentLine = fullArray[i];
   		//currentLine.push(0,0,0,0)
-  		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0]
-  		for (var j = 0; j <= 11; j++) {
+  		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0,0]
+  		for (var j = 0; j <= 12; j++) {
 
   			if (!isNaN(currentLine[j])){
   				trimmedline[j] = currentLine[j];
@@ -198,6 +198,46 @@ initGraph9();
 initGraph10();
 */
 
+//copied from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
+var predImpact = []
+
+const Sdata = tf.tensor1d(accX);
+const Fdata = tf.tensor1d(velX);
+const Zdata = tf.tensor1d(velY);
+const Adata = tf.tensor1d(angX);
+
+
+const Rdata = tf.tensor1d(isImpact)
+
+const a0 = tf.scalar(Math.random()).variable();
+const a1 = tf.scalar(Math.random()).variable();
+const a2 = tf.scalar(Math.random()).variable();
+const a3 = tf.scalar(Math.random()).variable();
+const a4 = tf.scalar(Math.random()).variable();
+
+const fun = (a,z,r,s) => a4.mul(a).add(a3.mul(z)).add(a2.mul(r)).add(a1.mul(s)).add(a0)
+const cost = (pred, label) => pred.sub(label).square().mean();
+
+const learningRate = 0.001;
+const optimizer = tf.train.sgd(learningRate);
+
+// Train the model.
+for (let i = 0; i < 800; i++) {
+    console.log("training")
+    optimizer.minimize(() => cost(fun(Adata,Zdata,Rdata,Sdata), Fdata));
+}
+
+console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}, e: ${a4.dataSync()}`);
+
+const preds = fun(Adata,Zdata,Rdata,Sdata).dataSync();
+preds.forEach((pred, i) => {
+   console.log(`x: ${i}, pred: ${pred}`,isImpact[i]);
+   fullArray[i][12] = pred
+});
+
+console.log(predImpact)
+
+
 //adds table
 		var headingsArray = fullArray;
 		headingsArray.reverse();
@@ -222,40 +262,6 @@ initGraph10();
 		//append the compiled table to the DOM
 		document.getElementById("longTable").appendChild(table);
 
-//copied from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
-var predImpact = []
-
-const Sdata = tf.tensor1d(accX);
-const Fdata = tf.tensor1d(velX);
-const Zdata = tf.tensor1d(angX);
-const Rdata = tf.tensor1d(isImpact)
-
-const a0 = tf.scalar(Math.random()).variable();
-const a1 = tf.scalar(Math.random()).variable();
-const a2 = tf.scalar(Math.random()).variable();
-const a3 = tf.scalar(Math.random()).variable();
-
-const fun = (z,r,s) => a3.mul(z).add(a2.mul(r)).add(a1.mul(s)).add(a0)
-const cost = (pred, label) => pred.sub(label).square().mean();
-
-const learningRate = 0.001;
-const optimizer = tf.train.sgd(learningRate);
-
-// Train the model.
-for (let i = 0; i < 800; i++) {
-    console.log("training")
-    optimizer.minimize(() => cost(fun(Zdata,Rdata,Sdata), Fdata));
-}
-
-console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}`);
-
-const preds = fun(Zdata,Rdata,Sdata).dataSync();
-preds.forEach((pred, i) => {
-   console.log(`x: ${i}, pred: ${pred}`,isImpact[i]);
-   fullArray[i][12] = pred
-});
-
-console.log(predImpact)
 
 
 /*
