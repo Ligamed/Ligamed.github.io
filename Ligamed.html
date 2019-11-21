@@ -83,6 +83,11 @@
   <br>
     <td><button  id="breakbutton" style="display:block;" onclick="breakGAIT()">Begin training GAIT</button></td>
     <td><button  id="resumebutton" style="display:none;" onclick="resumeGAIT()">End training GAIT</button></td>
+  <br>
+    <td><button  id="togglestepon" style="display:block;" onclick="stepToggleOn()">Train steps</button></td>
+    <td><button  id="beginstep" style="display:none;" onclick="beginStep()">Begin step</button></td>
+    <td><button  id="endstep" style="display:none;" onclick="endStep()">End step</button></td>
+    <td><button  id="togglestepoff" style="display:none;" onclick="stepToggleOff()">Stop training steps</button></td>
 
   <br>
   <br>
@@ -214,7 +219,7 @@ function handleData(event) {
   //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
 
   var currenttime = event.timeStamp.toFixed(2);
-  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2]);
+  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,0,0,0,0,isImpact]);
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
 }
@@ -336,6 +341,46 @@ function resumeGAIT(){
     y.style.display = "none";
   }
 
+
+
+function stepToggleOn(){
+    fullArray.push(["breakStep"]);
+    var x = document.getElementById("togglestepon");
+    x.style.display = "none";
+    var y = document.getElementById("beginstep");
+    y.style.display = "block";
+    var z = document.getElementById("togglestepoff");
+    z.style.display = "block";    
+  }
+function stepToggleOff(){
+    fullArray.push(["resumeStep"]);
+    var x = document.getElementById("togglestepon");
+    x.style.display = "block";
+    var y = document.getElementById("togglestepoff");
+    y.style.display = "none";
+    var x = document.getElementById("beginstep");
+    x.style.display = "none";
+    var y = document.getElementById("endstep");
+    y.style.display = "none";
+    isImpact = 0
+  }
+  var isImpact = 0
+function beginStep(){
+    //fullArray.push(["breakGAIT"]);
+    var x = document.getElementById("beginstep");
+    x.style.display = "none";
+    var y = document.getElementById("endstep");
+    y.style.display = "block";
+    isImpact = 1
+  }
+function endStep(){
+    //fullArray.push(["resumeGAIT"]);
+    var x = document.getElementById("beginstep");
+    x.style.display = "block";
+    var y = document.getElementById("endstep");
+    y.style.display = "none";
+    isImpact = 0
+  }
 
 
 function savedatalocal(){
