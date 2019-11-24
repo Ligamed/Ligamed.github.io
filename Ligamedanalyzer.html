@@ -34,6 +34,7 @@
 <h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
 <p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
+<p><button onclick="loadLocalDataSteps()" type="button">Click to Load Trained Steps</button></p>
 <p><button onclick="stuffEverythingHere()" type="button">Click Run</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
 <br>
@@ -56,6 +57,7 @@
         <td><button onclick="loadFileAsText()">Load Selected File</button><td>
     </tr>
     <p id="temparray"></p>
+    <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
 <div id="longTable" style="display:none;width:100px;height:200px;"></div>
@@ -82,17 +84,24 @@ var angX = [];
 var angY = [];
 var angZ = [];
 var isImpact = [];
+var trainoverallTime = [];
+var trainaccX = [];
+var trainaccY = [];
+var trainaccZ = [];
+var trainvelX = [];
+var trainvelY = [];
+var trainvelZ = [];
+var trainmagAcc = [];
+var trainangX = [];
+var trainangY = [];
+var trainangZ = [];
+var trainisImpact = [];
+
+var loadedtrainingdata = 0;
 
 
 
 
-
-
-
-// Loads data from localdata
-function loadLocalData(){
-fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
-}
 
 //function that runs like... everything
 function stuffEverythingHere() { 
@@ -102,8 +111,27 @@ function stuffEverythingHere() {
 		fullArray[i][7] = accMagnitude(fullArray[i][1],fullArray[i][2],fullArray[i][3]);
 	}
 
-	 	//integrates angles
+	 //integrates angles
 	fullArray = checkAngle(fullArray);
+
+/*
+	
+	//adds a bunch of 0's to the array so I stop getting so many array bound errors
+	//eh seems to have fixed itself somehow
+	var fixedarray = []
+	for (var i = 0; i <= fullArray.length-1; i++){
+  		var currentLine = []
+  		currentLine = fullArray[i];
+  		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  		for (var j = 0; j <= 13; j++) {
+  			trimmedline[j] = currentLine[j];
+  		}
+  		fixedarray.push(trimmedline)
+  	}
+
+  	fullArray = fixedarray;
+*/
+
 
 
   //set up training datasets
@@ -111,7 +139,7 @@ function stuffEverythingHere() {
   var currentGAIT = 1
   var avgMaxGAIT = [];
   var avgMinGAIT = [];
-  //sets training data to its own arrays
+  //sets GAIT training data to its own arrays
   for (var i = 0; i <= fullArray.length-1; i++) {
   	var currentGAITdata = [];
   	if (fullArray[i][0] == "breakGAIT") {
@@ -144,7 +172,29 @@ function stuffEverythingHere() {
 	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 	document.getElementById("textSprain").innerHTML = sprainFactor;
- 	trimmedArray = [];
+ 	
+	//sets step training data to its own arrays
+ 	trainStepData = [];
+ 	for (var i = 0; i <= fullArray.length-1; i++) {
+  	if (fullArray[i][0] == "breakStep") {
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  				if (fullArray[i][0] == "resumeStep") {j=0;}
+  				else{
+  				trainStepData.push(fullArray[i]);
+  				}
+
+  			}
+  		
+  		}
+  	}
+
+
+
+	traintrimmedArray = [];
+	trimmedArray = [];
+
 
   	//removes text and NaN's from data
   	for (var i = 0; i <= fullArray.length-1; i++){
@@ -155,7 +205,7 @@ function stuffEverythingHere() {
   		for (var j = 0; j <= 12; j++) {
 
   			if (!isNaN(currentLine[j])){
-  				trimmedline[j] = currentLine[j];
+  				trimmedline[j] = Number(currentLine[j]);
   			}
   			else{
   				trimmedline[j] = 0;
@@ -166,7 +216,32 @@ function stuffEverythingHere() {
   		
   	}
 
- 
+
+
+
+
+
+  	/*
+  	//dumps first 50 lines of data that won't have agnles
+  	for (var i = 50; i <= trimmedArray.length-1; i++){
+  		trimmedArray[i] = trimmedArray[i-50]
+  	}
+ 	*/
+ 	
+	for (var i = 0; i <= trainStepData.length-1; i++) {
+		trainoverallTime[i] = trainStepData[i][0];
+		trainaccX[i] = trainStepData[i][1];
+		trainaccY[i] = trainStepData[i][2];
+		trainaccZ[i] = trainStepData[i][3];
+		trainvelX[i] = trainStepData[i][4];
+		trainvelY[i] = trainStepData[i][5];
+		trainvelZ[i] = trainStepData[i][6];
+		trainmagAcc[i] = trainStepData[i][7];
+		trainangX[i] = Number(trainStepData[i][8]);
+		trainangY[i] = Number(trainStepData[i][9]);
+		trainangZ[i] = Number(trainStepData[i][10]);
+		trainisImpact[i] = trainStepData[i][11];
+	}
 
 	for (var i = 0; i <= trimmedArray.length-1; i++) {
 		overallTime[i] = trimmedArray[i][0];
@@ -184,7 +259,6 @@ function stuffEverythingHere() {
 	}
 
 
-
 /*
 initGraph1();
 initGraph2();
@@ -198,50 +272,17 @@ initGraph9();
 initGraph10();
 */
 
-//copied from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
-var predImpact = []
-
-const Sdata = tf.tensor1d(accX);
-const Fdata = tf.tensor1d(velX);
-const Zdata = tf.tensor1d(velY);
-const Adata = tf.tensor1d(angX);
-
-
-const Rdata = tf.tensor1d(isImpact)
-
-const a0 = tf.scalar(Math.random()).variable();
-const a1 = tf.scalar(Math.random()).variable();
-const a2 = tf.scalar(Math.random()).variable();
-const a3 = tf.scalar(Math.random()).variable();
-const a4 = tf.scalar(Math.random()).variable();
-
-const fun = (a,z,r,s) => a4.mul(a).add(a3.mul(z)).add(a2.mul(r)).add(a1.mul(s)).add(a0)
-const cost = (pred, label) => pred.sub(label).square().mean();
-
-const learningRate = 0.001;
-const optimizer = tf.train.sgd(learningRate);
-
-// Train the model.
-for (let i = 0; i < 800; i++) {
-    console.log("training")
-    optimizer.minimize(() => cost(fun(Adata,Zdata,Rdata,Sdata), Fdata));
-}
-
-console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}, e: ${a4.dataSync()}`);
-
-const preds = fun(Adata,Zdata,Rdata,Sdata).dataSync();
-preds.forEach((pred, i) => {
-   console.log(`x: ${i}, pred: ${pred}`,isImpact[i]);
-   fullArray[i][12] = pred
-});
-
-console.log(predImpact)
-
 
 //adds table
-		var headingsArray = fullArray;
+
+	if (loadedtrainingdata==0){
+		getFormula()
+		}	
+	runFormula()
+
+		var headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw"]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value"]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -263,122 +304,100 @@ console.log(predImpact)
 		document.getElementById("longTable").appendChild(table);
 
 
+}
+//-----------------------------------------------------------------------------------------
 
-/*
 
-trainX1 = accX
-trainX2 = velX
-trainX3 = angX
-trainY = isImpact
 
-m = tf.variable(tf.scalar(Math.random()));
-b = tf.variable(tf.scalar(Math.random()));
 
-plot();
-*/
+
+function getFormula(){
+	//original from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
+	var predImpact = []
+
+	const Sdata = tf.tensor1d(trainaccX);
+	const Rdata = tf.tensor1d(trainvelX);
+	const Zdata = tf.tensor1d(trainvelY);
+	const Bdata = tf.tensor1d(trainangY);
+	const Adata = tf.tensor1d(trainangX);
+	
+
+	const Fdata = tf.tensor1d(trainisImpact)
+
+	const a0 = tf.scalar(Math.random()).variable();
+	const a1 = tf.scalar(Math.random()).variable();
+	const a2 = tf.scalar(Math.random()).variable();
+	const a3 = tf.scalar(Math.random()).variable();
+	const a4 = tf.scalar(Math.random()).variable();
+	const a5 = tf.scalar(Math.random()).variable();
+
+	const fun = (a,b,z,r,s) => a5.mul(a).add(a4.mul(b)).add(a3.mul(z)).add(a2.mul(r)).add(a1.mul(s)).add(a0)
+	const cost = (pred, label) => pred.sub(label).square().mean();
+
+	const learningRate = 0.001;
+	const optimizer = tf.train.adam(learningRate);
+
+	// Train the model.
+
+	for (let i = 0; i < 1000; i++) {
+    	console.log("training")
+    	optimizer.minimize(() => cost(fun(Adata,Bdata,Zdata,Rdata,Sdata), Fdata));
+	}
+
+
+	//console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}, e: ${a4.dataSync()}`);
+
+	coefficientsCalc = [Number(a0.dataSync()),Number(a1.dataSync()),Number(a2.dataSync()),Number(a3.dataSync()),Number(a4.dataSync()),Number(a5.dataSync())]
+	inputCoeff = [Number(a0.dataSync()),Number(a1.dataSync()),Number(a2.dataSync()),Number(a3.dataSync()),Number(a4.dataSync()),Number(a5.dataSync())]
+
+
+	const preds = fun(Adata,Bdata,Zdata,Rdata,Sdata).dataSync();
+	preds.forEach((pred, i) => {
+  	 
+  	 /*
+  	 traintrimmedArray[i][13] = pred
+  	 if (pred>0) {
+  	 	traintrimmedArray[i][12] = 0
+  	 }
+  	 else{
+   		traintrimmedArray[i][12] = 1
+   	}
+   	*/
+	});
+
+
 }
 
-/*
-function predict(x) {
-  return tf.tidy(function() {
-    return m.mul(x).add(b);
-  });
-}
-
-
-function loss(prediction, labels) {
-  //subtracts the two arrays & squares each element of the tensor then finds the mean.
-  error = prediction
-    .sub(labels)
-    .square()
-    .mean();
-  return error;
-}
-
-function train() {
-  learningRate = 0.01;
-  optimizer = tf.train.sgd(learningRate);
-
-  optimizer.minimize(function() {
-    predsYs = predict(tf.tensor1d(trainX1));
-    stepLoss = loss(predsYs, tf.tensor1d(trainY));
-    return stepLoss;
-  });
-  plot();
-}
-
-
-async function plot() {
-  let plotData = [];
-
-  for (let i = 0; i < trainY.length; i++) {
-    plotData.push({ x: trainX1[i], y: trainY[i] });
-  }
-
-  ctx = document.getElementById("myChart").getContext("2d");
-
-  scatterChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      datasets: [
-        {
-          label: "Training Data",
-          showLine: false,
-          data: plotData,
-          fill: false
-        },
-        {
-          label: "Y = " + m.dataSync()[0] + "X + " + b.dataSync()[0],
-          data: [
-            {
-              x: 0,
-              y: b.dataSync()[0]
-            },
-            {
-              x: 11,
-              y: 11 * m.dataSync()[0] + b.dataSync()[0]
-            }
-          ],
-
-          // Changes this dataset to become a line
-          type: "line",
-          borderColor: "red",
-          fill: false
-        }
-      ]
-    },
-    options: {
-      animation: false,
-      scales: {
-          yAxes: [
-           {
-              ticks: {
-                max: 5
-              }
-            }
-          ],
-        xAxes: [
-          {
-            type: "linear",
-            position: "bottom"
-          }
-        ]
-      }
-    }
-  });
+function runFormula(){
+	const a0 = inputCoeff[0];
+	const a1 = inputCoeff[1];
+	const a2 = inputCoeff[2];
+	const a3 = inputCoeff[3];
+	const a4 = inputCoeff[4];
+	const a5 = inputCoeff[5];
+	
+	for (var i = 0; i <= trimmedArray.length-1; i++){
+		var pred = a5 * (angX[i]) + a4 * (angY[i]) + (a3 * (velY[i])) + (a2 * (velX[i])) + (a1 * (accX[i])) + (a0)
+		
+  		 trimmedArray[i][13] = pred
+  		 if (pred>0) {
+  	 		trimmedArray[i][12] = 0
+  		 }
+  		 else{
+   			trimmedArray[i][12] = 1
+   		}
+		;
+	}
 }
 
 
-
-
-*/
 
 
 //function dataClear() {
 //localStorage.clear()
 //document.getElementById("result").innerHTML = "";}
 
-
+//-----------------------------------------------------------------------------------------
 //computation functions below
 
 function maxRoll(inputArray){
@@ -458,8 +477,9 @@ function accMagnitude(x,y,z){
 
 }
 
+//Integrates the anglular velocity over time to get the angle moved
 function checkAngle(inputArray){
-
+	//delays running the function for the first 50 lines to prevent array bound issues. Can probably be dropped to 30, but I don't like more things breaking
 	for (var i = 50; i <= inputArray.length - 1; i++) {
 		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep'){
 			i = i+1;
@@ -469,7 +489,7 @@ function checkAngle(inputArray){
 		var y = 0;
 		var z = 0;
 
-
+		//integrates over 1 second
 		while (inputArray[i][0] - inputArray[j][0] <= 1000){
 			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'
 				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep'
@@ -478,9 +498,9 @@ function checkAngle(inputArray){
 			}
 
 
-			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/1000;
-			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/1000;
-			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/200;
+			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/200;
+			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/200;
 			j = j - 1;
 		}
 		x = x.toFixed(2);
@@ -495,7 +515,7 @@ function checkAngle(inputArray){
 }
 
 
-//checks chance of sprain. This has taken far too long to get.
+//checks chance of sprain. This has taken far too long to get. Neil provided pseudocode for this section
 function riskAnalysis(inputArray,min,max){
 	var countOut = 0;
 	var countIn = 0;
@@ -518,10 +538,11 @@ function riskAnalysis(inputArray,min,max){
 
 
 
-/*
 
+//-----------------------------------------------------------------------------------------
 //Output functions
 
+/*
 //graph
 function initGraph1(){
 	var trace1 = {
@@ -654,11 +675,27 @@ function initGraph10(){
 */
 
 
-
-
-
-
+//-----------------------------------------------------------------------------------------
 //Utility functions below
+
+// Loads data from localdata
+function loadLocalData(){
+fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
+}
+
+//loads step training data
+function loadLocalDataSteps(){
+	inputCoeff = JSON.parse(localStorage.getItem("trainedSteps") || "[]");
+	for (var i = 0; i <= inputCoeff.length - 1; i++) {
+	 inputCoeff[i] = Number(inputCoeff[i]);
+	}
+	loadedtrainingdata = 1;
+}
+
+
+
+//toggles graphs on/off
+//not really used atm
 function togglegraph() {
   var x = document.getElementById("graph1box");
   if (x.style.display === "none") {
@@ -723,7 +760,7 @@ function togglegraph() {
 
 }
 
-
+//toggles table of raw data
 function toggleTable() {
   var x = document.getElementById("longTable");
   if (x.style.display === "none") {
@@ -733,6 +770,7 @@ function toggleTable() {
   }
 }
 
+//saves data to csv file
 function saveTextAsFile(){
 	var headingsArray = fullArray;
 	//headingsArray.reverse();
@@ -754,6 +792,7 @@ function saveTextAsFile(){
 
 }
 
+//Neil made me remove all the fun from this one
 function runData(){
 	var x = document.getElementById("line1");
     var y = document.getElementById("line2");
@@ -766,6 +805,10 @@ function runData(){
     y.style.display = "none";
     }
 
+}
+//saves training step data
+function savedatalocal(){
+localStorage.setItem("trainedSteps", JSON.stringify(coefficientsCalc));
 }
 
 
@@ -854,7 +897,13 @@ function csv2array(data, delimeter) {
     // add the value to the array
     if (array.length <= row) 
       array.push(new Array());
-  		value = Number(value); //Zach added this to try to fix the load
+  		//edited
+  		if (value == 'resumeGAIT' || value == 'breakGAIT' || value == 'resumeStep' || value == 'breakStep' || value == 'resumeStep') {
+
+  		}
+  		else{value = Number(value);
+  		}
+  		 //I added this to try to fix the load. Seems to make things work
     array[row].push(value);
     
     // skip whitespaces
