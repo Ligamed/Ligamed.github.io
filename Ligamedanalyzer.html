@@ -498,9 +498,9 @@ function checkAngle(inputArray){
 			}
 
 
-			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/200;
-			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/200;
-			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/200;
+			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/1000;
+			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/1000;
 			j = j - 1;
 		}
 		x = x.toFixed(2);
