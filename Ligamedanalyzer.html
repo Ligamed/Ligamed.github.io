@@ -114,6 +114,7 @@ function stuffEverythingHere() {
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
 	fullArray = atRisk(fullArray);
+	console.log(fullArray)
 /*
 	
 	//adds a bunch of 0's to the array so I stop getting so many array bound errors
@@ -182,14 +183,14 @@ function stuffEverythingHere() {
 	var averagedMinGAIT = angleAverage(avgMinGAIT);
 
   	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
-
+	
 
 	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 	document.getElementById("textSprain").innerHTML = sprainFactor;
  	
 
-
+	
 	//sets step training data to its own arrays
  	trainStepData = [];
  	for (var i = 0; i <= fullArray.length-1; i++) {
@@ -219,7 +220,7 @@ function stuffEverythingHere() {
   		currentLine = fullArray[i];
   		//currentLine.push(0,0,0,0)
   		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0,0]
-  		for (var j = 0; j <= 12; j++) {
+  		for (var j = 0; j <= 14; j++) {
 
   			if (!isNaN(currentLine[j])){
   				trimmedline[j] = Number(currentLine[j]);
@@ -563,6 +564,7 @@ function atRisk(inputArray){
 			inputArray[i][14] = 1
 		}
 	}
+	return inputArray
 }
 
 
