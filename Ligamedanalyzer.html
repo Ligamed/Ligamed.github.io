@@ -113,7 +113,7 @@ function stuffEverythingHere() {
 
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
-
+	fullArray = atRisk(fullArray);
 /*
 	
 	//adds a bunch of 0's to the array so I stop getting so many array bound errors
@@ -130,10 +130,25 @@ function stuffEverythingHere() {
   	}
 
   	fullArray = fixedarray;
-*/
+	*/
 
 
 
+	/*
+	var testXs = []
+	var testYs = []
+	
+	//sets up and saves some arrays for testing uses. Probably not going to be needed for anything
+	for (var i = 0; i <= fullArray.length-1; i++) {
+		testXs.push([fullArray[i][1],fullArray[i][4],fullArray[i][5],fullArray[i][8],fullArray[i][9]])
+		testYs.push(fullArray[i][11])
+
+	}
+	localStorage.setItem("test_xs", JSON.stringify(testXs));
+	localStorage.setItem("test_ys", JSON.stringify(testYs));
+	*/
+
+	
   //set up training datasets
   var trainGAIT = [];
   var currentGAIT = 1
@@ -173,6 +188,8 @@ function stuffEverythingHere() {
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 	document.getElementById("textSprain").innerHTML = sprainFactor;
  	
+
+
 	//sets step training data to its own arrays
  	trainStepData = [];
  	for (var i = 0; i <= fullArray.length-1; i++) {
@@ -273,16 +290,19 @@ initGraph10();
 */
 
 
-//adds table
+
 
 	if (loadedtrainingdata==0){
 		getFormula()
 		}	
 	runFormula()
 
+
+	
+	//adds table
 		var headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value"]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value","isRisk"]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -301,7 +321,7 @@ initGraph10();
 		  }
 		}
 		//append the compiled table to the DOM
-		document.getElementById("longTable").appendChild(table);
+		document.getElementById("longTable").appendChild(table);	
 
 
 }
@@ -533,8 +553,17 @@ function riskAnalysis(inputArray,min,max){
 	return percentageOut	
 }
 
-
-
+//Checks if instance within normal bounds. Neil provided pseudocode for this section. I think the numbers came from a few of the trials him and Akshay were running
+function atRisk(inputArray){
+	for (var i = 50; i <= inputArray.length - 1; i++) {
+		if (inputArray[i][7]<1.05 && inputArray[i][8]> -15 && inputArray[i][8] < 25) {
+			inputArray[i][14] = 0
+		}
+		else{
+			inputArray[i][14] = 1
+		}
+	}
+}
 
 
 
