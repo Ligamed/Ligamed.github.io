@@ -557,8 +557,14 @@ function riskAnalysis(inputArray,min,max){
 //Checks if instance within normal bounds. Neil provided pseudocode for this section. I think the numbers came from a few of the trials him and Akshay were running
 function atRisk(inputArray){
 	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][7]<1.05 && inputArray[i][8]> -15 && inputArray[i][8] < 25) {
+		if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95) {
 			inputArray[i][14] = 0
+		}
+		else if(inputArray[i][7] > 1.1){
+
+		}
+		else if(inputArray[i][7] < .9 && inputArray[i][8]> -15 && inputArray[i][8] < 25){
+			
 		}
 		else{
 			inputArray[i][14] = 1
