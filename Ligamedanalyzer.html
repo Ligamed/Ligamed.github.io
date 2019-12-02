@@ -53,6 +53,7 @@
 <p>Sprain Risk Factor</p>
 <div id="textSprain"></div>
 <br>
+<br>
 <p>Outwards</p>
 <div id="When running try rolling the foot more to the right"></div>
 <br>
@@ -125,9 +126,21 @@ function stuffEverythingHere() {
 
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
-	fullArray = atRisk(fullArray);
+	fullArray = determineStep(fullArray);
+
+	var leftOrRight = ""
+
+	for (var i = 0; i <= fullArray.length-1; i++) {
+  		if (fullArray[i][0] == "isleft") {
+  			leftOrRight = "left"
+  		}
+  		if (fullArray[i][0] == "isRight") {
+  			leftOrRight = "right"
+  		}  		
+  	}
 
 
+  	console.log(leftOrRight)
 
   var angleMovedLeft =[];
   var angleMovedRight = [];
@@ -194,19 +207,6 @@ function stuffEverythingHere() {
 
 
 
-	/*
-	var testXs = []
-	var testYs = []
-	
-	//sets up and saves some arrays for testing uses. Probably not going to be needed for anything
-	for (var i = 0; i <= fullArray.length-1; i++) {
-		testXs.push([fullArray[i][1],fullArray[i][4],fullArray[i][5],fullArray[i][8],fullArray[i][9]])
-		testYs.push(fullArray[i][11])
-
-	}
-	localStorage.setItem("test_xs", JSON.stringify(testXs));
-	localStorage.setItem("test_ys", JSON.stringify(testYs));
-	*/
 
 	
   //set up training datasets
@@ -352,9 +352,9 @@ function stuffEverythingHere() {
 	var THIRD_VAL = .6745
 
 	for (var i = 0; i <= trimmedArray.length - 1; i++) {
-		trimmedArray[i][15] = getOutliers(trimmedArray[i][1],accX_MAD,accX_MED,THIRD_VAL)
-		trimmedArray[i][16] = getOutliers(trimmedArray[i][4],velX_MAD,velX_MED,THIRD_VAL)
-		trimmedArray[i][17] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
+		trimmedArray[i][13] = getOutliers(trimmedArray[i][1],accX_MAD,accX_MED,THIRD_VAL)
+		trimmedArray[i][14] = getOutliers(trimmedArray[i][4],velX_MAD,velX_MED,THIRD_VAL)
+		trimmedArray[i][15] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
 	}
 
 
@@ -373,19 +373,13 @@ function stuffEverythingHere() {
 		isImpact[i] = trimmedArray[i][11];
 	}
 
-
-
-	if (loadedtrainingdata==0){
-		getFormula()
-		}	
-	runFormula()
-
+	//for (var i = 0; i <= trimmedArray.length-1; i++) {
 
 	
 	//adds table
 		headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value","isRisk","X Acceleration Z-Score","Roll Velocity Z-Score","Roll Angle Z-Score" ]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","X Acceleration Z-Score","Roll Velocity Z-Score","Roll Angle Z-Score" ]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -444,87 +438,6 @@ function getOutliers(inputVal,MAD,MEDIAN,THIRD_VAL){
 	return zval
 }
 
-
-var traintrimmedArray = [];
-
-function getFormula(){
-	//original from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
-	var predImpact = []
-
-	const Sdata = tf.tensor1d(trainaccX);
-	const Rdata = tf.tensor1d(trainvelX);
-	const Zdata = tf.tensor1d(trainvelY);
-	const Bdata = tf.tensor1d(trainangY);
-	const Adata = tf.tensor1d(trainangX);
-	
-
-	const Fdata = tf.tensor1d(trainisImpact)
-
-	const a0 = tf.scalar(Math.random()).variable();
-	const a1 = tf.scalar(Math.random()).variable();
-	const a2 = tf.scalar(Math.random()).variable();
-	const a3 = tf.scalar(Math.random()).variable();
-	const a4 = tf.scalar(Math.random()).variable();
-	const a5 = tf.scalar(Math.random()).variable();
-
-	const fun = (a,b,z,r,s) => a5.mul(a).add(a4.mul(b)).add(a3.mul(z)).add(a2.mul(r)).add(a1.mul(s)).add(a0)
-	const cost = (pred, label) => pred.sub(label).square().mean();
-
-	const learningRate = 0.001;
-	const optimizer = tf.train.adam(learningRate);
-
-	// Train the model.
-
-	for (let i = 0; i < 1000; i++) {
-    	console.log("training")
-    	optimizer.minimize(() => cost(fun(Adata,Bdata,Zdata,Rdata,Sdata), Fdata));
-	}
-
-
-	//console.log(`a: ${a0.dataSync()}, b: ${a1.dataSync()}, c: ${a2.dataSync()}, d: ${a3.dataSync()}, e: ${a4.dataSync()}`);
-
-	coefficientsCalc = [Number(a0.dataSync()),Number(a1.dataSync()),Number(a2.dataSync()),Number(a3.dataSync()),Number(a4.dataSync()),Number(a5.dataSync())]
-	inputCoeff = [Number(a0.dataSync()),Number(a1.dataSync()),Number(a2.dataSync()),Number(a3.dataSync()),Number(a4.dataSync()),Number(a5.dataSync())]
-
-
-	const preds = fun(Adata,Bdata,Zdata,Rdata,Sdata).dataSync();
-	preds.forEach((pred, i) => {
-  	 
-  	 /*
-  	 traintrimmedArray[i][13] = pred
-  	 if (pred>0) {
-  	 	traintrimmedArray[i][12] = 0
-  	 }
-  	 else{
-   		traintrimmedArray[i][12] = 1
-   	}
-   	*/
-	});
-
-
-}
-
-function runFormula(){
-	const a0 = inputCoeff[0];
-	const a1 = inputCoeff[1];
-	const a2 = inputCoeff[2];
-	const a3 = inputCoeff[3];
-	const a4 = inputCoeff[4];
-	const a5 = inputCoeff[5];
-	
-	for (var i = 0; i <= trimmedArray.length-1; i++){
-		var pred = a5 * (angX[i]) + a4 * (angY[i]) + (a3 * (velY[i])) + (a2 * (velX[i])) + (a1 * (accX[i])) + (a0)
-		
-  		 trimmedArray[i][13] = pred
-  		 if (pred>0) {
-  	 		trimmedArray[i][12] = 0
-  		 }
-  		 else{
-   			trimmedArray[i][12] = 1
-   		}
-		;
-	}
-}
 
 
 
@@ -613,7 +526,7 @@ function accMagnitude(x,y,z){
 function checkAngle(inputArray){
 	//delays running the function for the first 50 lines to prevent array bound issues. Can probably be dropped to 30, but I don't like more things breaking
 	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep'){
+		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep' || inputArray[i][0] == 'isLeft' || inputArray[i][0] == 'isRight'){
 			i = i+1;
 		}
 		var j = i;
@@ -624,7 +537,7 @@ function checkAngle(inputArray){
 		//integrates over 1 second
 		while (inputArray[i][0] - inputArray[j][0] <= 1000){
 			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'
-				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep'
+				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep' || inputArray[j][0] == 'isRight' || inputArray[j][0] == 'isLeft' || inputArray[j-1][0] == 'isRight' || inputArray[j-1][0] == 'isLeft'
 				){
 				j = j-2;
 			}
@@ -661,8 +574,6 @@ function riskAnalysis(inputArray,min,max){
 			countIn = countIn + 1;
 		}
 	}
-
-
 	var percentageOut = countOut / (countIn + countOut)
 	return percentageOut	
 }
@@ -676,7 +587,6 @@ function determineStep(inputArray){
 		}
 		else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
 			//Mid Walking Stance
-
 		}
 		else if(inputArray[i][7] < .9 && inputArray[i][8]> -15 && inputArray[i][8] < 25){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
@@ -688,6 +598,8 @@ function determineStep(inputArray){
 	}
 	return inputArray
 }
+
+
 
 
 
@@ -707,10 +619,7 @@ fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 
 //loads step training data
 function loadLocalDataSteps(){
-	inputCoeff = JSON.parse(localStorage.getItem("trainedSteps") || "[]");
-	for (var i = 0; i <= inputCoeff.length - 1; i++) {
-		 inputCoeff[i] = Number(inputCoeff[i]);
-	}
+
 	trainedMinRoll = JSON.parse(localStorage.getItem("averagedMinGAITVal") || "[]");
 	trainedMinRoll = Number(trainedMinRoll)
 	trainedMaxRoll = JSON.parse(localStorage.getItem("averagedMaxGAITVal") || "[]");
@@ -773,10 +682,7 @@ function runData(){
     }
 
 }
-//saves training step data
-function savedatalocal(){
-localStorage.setItem("trainedSteps", JSON.stringify(coefficientsCalc));
-}
+
 
 
 //loads csv file that has been saved from either page earlier
@@ -865,7 +771,7 @@ function csv2array(data, delimeter) {
     if (array.length <= row) 
       array.push(new Array());
   		//edited
-  		if (value == 'resumeGAIT' || value == 'breakGAIT' || value == 'resumeStep' || value == 'breakStep' || value == 'resumeStep') {
+  		if (value == 'resumeGAIT' || value == 'breakGAIT' || value == 'resumeStep' || value == 'breakStep' || value == 'resumeStep' || value == 'isLeft' || value == 'isRight') {
 
   		}
   		else{value = Number(value);
