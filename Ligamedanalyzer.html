@@ -583,7 +583,7 @@ function determineStep(inputArray){
 	for (var i = 50; i <= inputArray.length - 1; i++) {
 		if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95 && inputArray[i][8] < 3 && inputArray[i][8] > -3) {
 			//Standing
-			inputArray[i][14] = 0
+			inputArray[i][12] = 0
 		}
 		else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
 			//Mid Walking Stance
@@ -593,7 +593,7 @@ function determineStep(inputArray){
 			
 		}
 		else{
-			inputArray[i][14] = 1
+			inputArray[i][12] = 1
 		}
 	}
 	return inputArray
