@@ -53,6 +53,12 @@
 <p>Sprain Risk Factor</p>
 <div id="textSprain"></div>
 <br>
+<p>Outwards</p>
+<div id="When running try rolling the foot more to the right"></div>
+<br>
+<p>Inwards</p>
+<div id="When running try rolling the foot more to the left"></div>
+<br>
 <br>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
@@ -655,20 +661,25 @@ function riskAnalysis(inputArray,min,max){
 			countIn = countIn + 1;
 		}
 	}
+
+
 	var percentageOut = countOut / (countIn + countOut)
 	return percentageOut	
 }
 
 //Checks if instance within normal bounds. Neil provided pseudocode for this section. I think the numbers came from a few of the trials him and Akshay were running
-function atRisk(inputArray){
+function determineStep(inputArray){
 	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95) {
+		if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95 && inputArray[i][8] < 3 && inputArray[i][8] > -3) {
+			//Standing
 			inputArray[i][14] = 0
 		}
-		else if(inputArray[i][7] > 1.1){
+		else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
+			//Mid Walking Stance
 
 		}
 		else if(inputArray[i][7] < .9 && inputArray[i][8]> -15 && inputArray[i][8] < 25){
+			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
 			
 		}
 		else{
