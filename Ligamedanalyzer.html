@@ -7,6 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
   <style>
   body,h1,p {margin: 16;background: #ffffff;color: black;font-family: 'Comfortaa', cursive;}
   h1 {font-size: 20px;}
@@ -114,7 +115,7 @@ function stuffEverythingHere() {
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
 	fullArray = atRisk(fullArray);
-	console.log(fullArray)
+
 /*
 	
 	//adds a bunch of 0's to the array so I stop getting so many array bound errors
@@ -210,11 +211,9 @@ function stuffEverythingHere() {
 
 
 
-	traintrimmedArray = [];
 	trimmedArray = [];
 
-
-  	//removes text and NaN's from data
+	//removes text and NaN's from data
   	for (var i = 0; i <= fullArray.length-1; i++){
   		var currentLine = []
   		currentLine = fullArray[i];
@@ -233,6 +232,7 @@ function stuffEverythingHere() {
   		if (trimmedline[0] !=0) {trimmedArray.push(trimmedline)}
   		
   	}
+
 
 
 
@@ -261,6 +261,27 @@ function stuffEverythingHere() {
 		trainisImpact[i] = trainStepData[i][11];
 	}
 
+	accX_MED = getMedian(trainaccX)
+	velX_MED = getMedian(trainvelX)
+	angX_MED = getMedian(trainangX)
+
+	accX_MAD = getMAD(trainaccX)
+	velX_MAD = getMAD(trainvelX)
+	angX_MAD = getMAD(trainangX)
+
+	var THIRD_VAL = 1
+
+	for (var i = 0; i <= trimmedArray.length - 1; i++) {
+		trimmedArray[i][15] = getOutliers(trimmedArray[i][1],accX_MAD,accX_MED,THIRD_VAL)
+		trimmedArray[i][16] = getOutliers(trimmedArray[i][4],velX_MAD,velX_MED,THIRD_VAL)
+		trimmedArray[i][17] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
+	}
+
+
+
+
+
+
 	for (var i = 0; i <= trimmedArray.length-1; i++) {
 		overallTime[i] = trimmedArray[i][0];
 		accX[i] = trimmedArray[i][1];
@@ -275,6 +296,12 @@ function stuffEverythingHere() {
 		angZ[i] = trimmedArray[i][10];
 		isImpact[i] = trimmedArray[i][11];
 	}
+
+
+
+
+
+
 
 
 /*
@@ -331,6 +358,39 @@ initGraph10();
 
 
 
+
+function getMedian(inputArray){
+	//#Source https://bit.ly/2neWfJ2 
+	//https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-88.php
+	const median = arr => {
+  		const mid = Math.floor(arr.length / 2),
+    	nums = [...arr].sort((a, b) => a - b);
+  		return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+	};
+	return median(inputArray)
+}
+
+function getMAD(inputArray){
+	var meanVal = inputArray.reduce((a, b) => a + b, 0) / inputArray.length
+	var calcMAD = 0
+	for (var i = 0; i <= inputArray.length-1; i++){
+		calcMAD = Math.abs(inputArray[i] - meanVal) + calcMAD
+	}
+	var acutalMAD = calcMAD / (inputArray.length)
+	return acutalMAD
+
+}
+
+
+function getOutliers(inputVal,MAD,MEDIAN,THIRD_VAL){
+
+	var zval = THIRD_VAL * (inputVal - MEDIAN) / MAD
+
+	return zval
+}
+
+
+var traintrimmedArray = [];
 
 function getFormula(){
 	//original from https://stackoverflow.com/questions/55484468/how-to-use-tensorflow-js-for-multi-variable-regression
@@ -730,7 +790,7 @@ function loadLocalDataSteps(){
 }
 
 
-
+/*
 //toggles graphs on/off
 //not really used atm
 function togglegraph() {
@@ -796,6 +856,7 @@ function togglegraph() {
   }
 
 }
+*/
 
 //toggles table of raw data
 function toggleTable() {
