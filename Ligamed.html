@@ -88,8 +88,16 @@
     <td><button  id="beginstep" style="display:none;" onclick="beginStep()">Begin step</button></td>
     <td><button  id="endstep" style="display:none;" onclick="endStep()">End step</button></td>
     <td><button  id="togglestepoff" style="display:none;" onclick="stepToggleOff()">Stop training steps</button></td>
-
   <br>
+    <br>
+    <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
+    <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
+    <br>
+    <br>
+    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
+    <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
+  <br>
+
   <br>
     <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
     <br>
@@ -380,7 +388,52 @@ function endStep(){
     isImpact = 0
   }
 
+function breakleft(){
+    fullArray.push(["breakleft"]);
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "block";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+function resumeleft(){
+    fullArray.push(["resumeleft"]);
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
 
+function breakright(){
+    fullArray.push(["breakright"]);
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "none";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "none";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "block";
+  }
+function resumeright(){
+    fullArray.push(["resumeright"]);
+    var x = document.getElementById("breakleftbutton");
+    x.style.display = "block";
+    var y = document.getElementById("resumeleftbutton");
+    y.style.display = "none";
+    var a = document.getElementById("breakrightbutton");
+    a.style.display = "block";
+    var b = document.getElementById("resumerightbutton");
+    b.style.display = "none";
+  }
+  
 function savedatalocal(){
 localStorage.setItem("ligamedData", JSON.stringify(fullArray));
 }
