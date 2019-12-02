@@ -30,6 +30,7 @@
   </style>
 </head>
 <body>
+<center>
 <p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo.jpg" width="600"> </button></p>
 <h1 id="line1" style = "display:none">LIGAMED!</h1>
 <h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
@@ -73,11 +74,9 @@
     <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
+
+</center>
 <div id="longTable" style="display:none;width:100px;height:200px;"></div>
-
-
-
-
 
 
 </body>
@@ -138,9 +137,6 @@ function stuffEverythingHere() {
   			leftOrRight = "right"
   		}  		
   	}
-
-
-  	console.log(leftOrRight)
 
   var angleMovedLeft =[];
   var angleMovedRight = [];
@@ -254,10 +250,10 @@ function stuffEverythingHere() {
 
 
 
-	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
+
 	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
-	document.getElementById("textSprain").innerHTML = sprainFactor;
+	
  	
 
 	
@@ -326,38 +322,26 @@ function stuffEverythingHere() {
 	}
 
 	if (loadedtrainingdata == 0) {
-		accX_MED = getMedian(trainaccX)
-		velX_MED = getMedian(trainvelX)
-		angX_MED = getMedian(trainangX)
 
-		accX_MAD = getMAD(trainaccX)
-		velX_MAD = getMAD(trainvelX)
+		angX_MED = getMedian(trainangX)
 		angX_MAD = getMAD(trainangX)
 
-		localStorage.setItem("saveZscoreVals", JSON.stringify([accX_MED,velX_MED,angX_MED,accX_MAD,velX_MAD,angX_MAD]));
+		localStorage.setItem("saveZscoreVals", JSON.stringify([angX_MED,angX_MAD]));
 	}
 
   	if(loadedtrainingdata == 1){
-  	
-  		accX_MED = trainedZscoreVals[1]
-		velX_MED = trainedZscoreVals[2]
-		angX_MED = trainedZscoreVals[3]
-
-		accX_MAD = trainedZscoreVals[4]
-		velX_MAD = trainedZscoreVals[5]
-		angX_MAD = trainedZscoreVals[6]
+		angX_MED = trainedZscoreVals[1]
+		angX_MAD = trainedZscoreVals[2]
 	}
 
 
 	var THIRD_VAL = .6745
 
 	for (var i = 0; i <= trimmedArray.length - 1; i++) {
-		trimmedArray[i][13] = getOutliers(trimmedArray[i][1],accX_MAD,accX_MED,THIRD_VAL)
-		trimmedArray[i][14] = getOutliers(trimmedArray[i][4],velX_MAD,velX_MED,THIRD_VAL)
-		trimmedArray[i][15] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
+		trimmedArray[i][13] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
 	}
 
-
+/*
 	for (var i = 0; i <= trimmedArray.length-1; i++) {
 		overallTime[i] = trimmedArray[i][0];
 		accX[i] = trimmedArray[i][1];
@@ -372,14 +356,21 @@ function stuffEverythingHere() {
 		angZ[i] = trimmedArray[i][10];
 		isImpact[i] = trimmedArray[i][11];
 	}
+*/
+	isProblem = []
+	for (var i = 0; i <= trimmedArray.length-1; i++) {
+		if (trimmedArray[i][12]==1 && trimmedArray[i][13] > 3)
+			isProblem.push(trimmedArray[i])
+	}
 
-	//for (var i = 0; i <= trimmedArray.length-1; i++) {
+	var sprainFactor = riskAnalysis(isProblem,averagedMinGAIT,averagedMaxGAIT);
+	document.getElementById("textSprain").innerHTML = sprainFactor;
 
-	
+
 	//adds table
 		headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","X Acceleration Z-Score","Roll Velocity Z-Score","Roll Angle Z-Score" ]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Roll Angle Z-Score" ]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -526,7 +517,10 @@ function accMagnitude(x,y,z){
 function checkAngle(inputArray){
 	//delays running the function for the first 50 lines to prevent array bound issues. Can probably be dropped to 30, but I don't like more things breaking
 	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep' || inputArray[i][0] == 'isLeft' || inputArray[i][0] == 'isRight'){
+		if (inputArray[i][0] == 'resumeGAIT' || inputArray[i][0] == 'breakGAIT'|| inputArray[i][0] == 'breakStep'|| inputArray[i][0] == 'resumeStep' 
+			|| inputArray[i][0] == 'isLeft' || inputArray[i][0] == 'isRight'
+			|| inputArray[i][0] == 'resumeleft'|| inputArray[i][0] == 'breakleft' || inputArray[i][0] == 'resumeright' || inputArray[i][0] == 'breakright'
+			){
 			i = i+1;
 		}
 		var j = i;
@@ -537,7 +531,10 @@ function checkAngle(inputArray){
 		//integrates over 1 second
 		while (inputArray[i][0] - inputArray[j][0] <= 1000){
 			if (inputArray[j][0] == 'resumeGAIT' || inputArray[j][0] == 'breakGAIT' || inputArray[j-1][0] == 'resumeGAIT' || inputArray[j-1][0] == 'breakGAIT'
-				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep' || inputArray[j][0] == 'isRight' || inputArray[j][0] == 'isLeft' || inputArray[j-1][0] == 'isRight' || inputArray[j-1][0] == 'isLeft'
+				|| inputArray[j][0] == 'resumeStep' || inputArray[j][0] == 'breakStep' || inputArray[j-1][0] == 'resumeStep' || inputArray[j-1][0] == 'breakStep' 
+				|| inputArray[j][0] == 'isRight' || inputArray[j][0] == 'isLeft' || inputArray[j-1][0] == 'isRight' || inputArray[j-1][0] == 'isLeft' 
+
+				|| inputArray[j][0] == 'breakleft' || inputArray[j-1][0] == 'breakleft' || inputArray[j][0] == 'resumeleft' || inputArray[j-1][0] == 'resumeleft' || inputArray[j][0] == 'breakright' || inputArray[j-1][0] == 'breakright' || inputArray[j][0] == 'resumeright' || inputArray[j-1][0] == 'resumeright'
 				){
 				j = j-2;
 			}
@@ -587,9 +584,11 @@ function determineStep(inputArray){
 		}
 		else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
 			//Mid Walking Stance
+			inputArray[i][12] = 0
 		}
 		else if(inputArray[i][7] < .9 && inputArray[i][8]> -15 && inputArray[i][8] < 25){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
+			inputArray[i][12] = 0
 			
 		}
 		else{
@@ -771,7 +770,8 @@ function csv2array(data, delimeter) {
     if (array.length <= row) 
       array.push(new Array());
   		//edited
-  		if (value == 'resumeGAIT' || value == 'breakGAIT' || value == 'resumeStep' || value == 'breakStep' || value == 'resumeStep' || value == 'isLeft' || value == 'isRight') {
+  		if (value == 'resumeGAIT' || value == 'breakGAIT' || value == 'resumeStep' || value == 'breakStep' || value == 'isLeft' || value == 'isRight'
+  			|| value == 'resumeleft' || value == 'breakleft' || value == 'resumeright' || value == 'breakright') {
 
   		}
   		else{value = Number(value);
