@@ -45,6 +45,11 @@
 <p>Min Roll</p>
 <div id="textMinRoll"></div>
 <br>
+<p>Left Roll</p>
+<div id="trainedleftdegrees"></div>
+<p>Right Roll</p>
+<div id="trainedrightdegrees"></div>
+<br>
 <p>Sprain Risk Factor</p>
 <div id="textSprain"></div>
 <br>
@@ -116,6 +121,42 @@ function stuffEverythingHere() {
 	fullArray = checkAngle(fullArray);
 	fullArray = atRisk(fullArray);
 
+
+
+  var angleMovedLeft =[];
+  var angleMovedRight = [];
+  //sets training data to its own arrays
+  for (var i = 0; i <= fullArray.length-1; i++) {
+  	if (fullArray[i][0] == "breakleft") {
+  		var trainLeftArray = [];
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  			if (fullArray[i][0] == "resumeleft") {j=0;}
+  			else{
+  			trainLeftArray.push(fullArray[i]);}
+  		}
+  		angleMovedLeft.push(angleIntegrate(trainLeftArray));
+  	}
+   	if (fullArray[i][0] == "breakright") {
+  		var trainRightArray = [];
+  		var j=1;
+  		while(j==1){
+  			i=1+i;
+  			if (fullArray[i][0] == "resumeright") {j=0;}
+  			else{
+  			trainRightArray.push(fullArray[i]);}
+  		}
+  		angleMovedRight.push(angleIntegrate(trainRightArray));
+
+  	} 	
+  }
+	var averagedLeftRoll = angleAverage(angleMovedLeft);
+	var averagedRightRoll = angleAverage(angleMovedRight);
+
+	document.getElementById("trainedleftdegrees").innerHTML = averagedLeftRoll;
+  	document.getElementById("trainedrightdegrees").innerHTML = averagedRightRoll;
+
 /*
 	
 	//adds a bunch of 0's to the array so I stop getting so many array bound errors
@@ -184,7 +225,10 @@ function stuffEverythingHere() {
 	var averagedMinGAIT = angleAverage(avgMinGAIT);
 
   	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
-	
+  	if(loadedtrainingdata == 0){
+  	localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
+  	localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
+	}
 
 	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
@@ -198,7 +242,7 @@ function stuffEverythingHere() {
   	if (fullArray[i][0] == "breakStep") {
   		var j=1;
   		while(j==1){
-  			i=1+i;
+  			i = 1+i;
   				if (fullArray[i][0] == "resumeStep") {j=0;}
   				else{
   				trainStepData.push(fullArray[i]);
@@ -234,11 +278,6 @@ function stuffEverythingHere() {
   	}
 
 
-
-
-
-
-
   	/*
   	//dumps first 50 lines of data that won't have agnles
   	for (var i = 50; i <= trimmedArray.length-1; i++){
@@ -261,25 +300,37 @@ function stuffEverythingHere() {
 		trainisImpact[i] = trainStepData[i][11];
 	}
 
-	accX_MED = getMedian(trainaccX)
-	velX_MED = getMedian(trainvelX)
-	angX_MED = getMedian(trainangX)
+	if (loadedtrainingdata == 0) {
+		accX_MED = getMedian(trainaccX)
+		velX_MED = getMedian(trainvelX)
+		angX_MED = getMedian(trainangX)
 
-	accX_MAD = getMAD(trainaccX)
-	velX_MAD = getMAD(trainvelX)
-	angX_MAD = getMAD(trainangX)
+		accX_MAD = getMAD(trainaccX)
+		velX_MAD = getMAD(trainvelX)
+		angX_MAD = getMAD(trainangX)
 
-	var THIRD_VAL = 1
+		localStorage.setItem("saveZscoreVals", JSON.stringify([accX_MED,velX_MED,angX_MED,accX_MAD,velX_MAD,angX_MAD]));
+	}
+
+  	if(loadedtrainingdata == 1){
+  	
+  		accX_MED = trainedZscoreVals[1]
+		velX_MED = trainedZscoreVals[2]
+		angX_MED = trainedZscoreVals[3]
+
+		accX_MAD = trainedZscoreVals[4]
+		velX_MAD = trainedZscoreVals[5]
+		angX_MAD = trainedZscoreVals[6]
+	}
+
+
+	var THIRD_VAL = .6745
 
 	for (var i = 0; i <= trimmedArray.length - 1; i++) {
 		trimmedArray[i][15] = getOutliers(trimmedArray[i][1],accX_MAD,accX_MED,THIRD_VAL)
 		trimmedArray[i][16] = getOutliers(trimmedArray[i][4],velX_MAD,velX_MED,THIRD_VAL)
 		trimmedArray[i][17] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
 	}
-
-
-
-
 
 
 	for (var i = 0; i <= trimmedArray.length-1; i++) {
@@ -296,27 +347,6 @@ function stuffEverythingHere() {
 		angZ[i] = trimmedArray[i][10];
 		isImpact[i] = trimmedArray[i][11];
 	}
-
-
-
-
-
-
-
-
-/*
-initGraph1();
-initGraph2();
-initGraph3();
-initGraph4();
-initGraph5();
-initGraph6();
-initGraph7();
-initGraph8();
-initGraph9();
-initGraph10();
-*/
-
 
 
 
@@ -504,11 +534,7 @@ function minRoll(inputArray){
 }
 
 
-
-
-
-/*
-//not used currently
+//gets trained roll angle
 function angleIntegrate(inputArray){
 	var anglexSum = 0;
 	var angleySum = 0;
@@ -527,9 +553,9 @@ function angleIntegrate(inputArray){
 	angley = angley.toFixed(2);
 	anglez = anglez.toFixed(2);
 
-	return [anglex,angley,anglez]
+	return anglex
 }
-*/
+
 
 function angleAverage(inputArray){
 	var x = 0;
@@ -639,137 +665,6 @@ function atRisk(inputArray){
 //-----------------------------------------------------------------------------------------
 //Output functions
 
-/*
-//graph
-function initGraph1(){
-	var trace1 = {
-		x: overallTime, 
-		y: accX,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph1', trace,);
-}
-function initGraph2(){
-	var trace1 = {
-		x: overallTime, 
-		y: accY,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph2', trace,);
-}
-function initGraph3(){
-	var trace1 = {
-		x: overallTime, 
-		y: accZ,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph3', trace,);
-}
-function initGraph4(){
-	var trace1 = {
-		x: overallTime, 
-		y: velX,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph4', trace,);
-}
-function initGraph5(){
-	var trace1 = {
-		x: overallTime, 
-		y: velY,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph5', trace,);
-}
-function initGraph6(){
-	var trace1 = {
-		x: overallTime, 
-		y: velZ,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph6', trace,);
-}
-function initGraph7(){
-	var trace1 = {
-		x: overallTime, 
-		y: magAcc,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph7', trace,);
-}
-function initGraph8(){
-	var trace1 = {
-		x: overallTime, 
-		y: angX,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph8', trace,);
-}
-function initGraph9(){
-	var trace1 = {
-		x: overallTime, 
-		y: angY,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph9', trace,);
-}
-function initGraph10(){
-	var trace1 = {
-		x: overallTime, 
-		y: angZ,
-		mode: 'scatter'
-		};
-	var trace = [trace1]
-  	Plotly.plot('graph10', trace,);
-}
-
-
-
-
-
-<p><button onclick="togglegraph()" type="button">Click for Graphs</button></p>
-<div id="graph1box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph1" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph2box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph2" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph3box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph3" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph4box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph4" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph5box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph5" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph6box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph6" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph7box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph7" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph8box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph8" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph9box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph9" style="width:1400px;height:400px;"></div>
-</div>
-<div id="graph10box" style="width:100%;height:400px;margin-top:20px;margin-bottom:5px;display:none;">
-   <div id="graph10" style="width:1400px;height:400px;"></div>
-</div>
-
-
-*/
 
 
 //-----------------------------------------------------------------------------------------
@@ -784,79 +679,21 @@ fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 function loadLocalDataSteps(){
 	inputCoeff = JSON.parse(localStorage.getItem("trainedSteps") || "[]");
 	for (var i = 0; i <= inputCoeff.length - 1; i++) {
-	 inputCoeff[i] = Number(inputCoeff[i]);
+		 inputCoeff[i] = Number(inputCoeff[i]);
 	}
+	trainedMinRoll = JSON.parse(localStorage.getItem("averagedMinGAITVal") || "[]");
+	trainedMinRoll = Number(trainedMinRoll)
+	trainedMaxRoll = JSON.parse(localStorage.getItem("averagedMaxGAITVal") || "[]");
+	trainedMaxRoll = Number(trainedMaxRoll)
+	trainedZscoreVals = JSON.parse(localStorage.getItem("saveZscoreVals") || "[]");
+	for (var i = 0; i <= trainedZscoreVals.length - 1; i++) {
+		 trainedZscoreVals[i] = Number(trainedZscoreVals[i]);
+	}
+
 	loadedtrainingdata = 1;
 }
 
 
-/*
-//toggles graphs on/off
-//not really used atm
-function togglegraph() {
-  var x = document.getElementById("graph1box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph2box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph3box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph4box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph5box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph6box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph7box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph8box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph9box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-  var x = document.getElementById("graph10box");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-
-}
-*/
 
 //toggles table of raw data
 function toggleTable() {
