@@ -19,7 +19,9 @@
   </style>
 </head>
 <body>
-  <img src="Ligamed_logo.jpg" width="600">
+  <center>
+    <img src="Ligamed_logo.jpg" width="600">
+
   <p>Connect to bluetooth to begin</p>
   <p>It is recommended to fully power off LIGAMED Device between bluetooth connections</p>
   <div style="width:95%;height:100%;border-color: white;border-style: solid;border-width: 1;">
@@ -79,21 +81,27 @@
     <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
       <div id="graph2" style="width:1400px;height:200px;"></div>
     </div>
-
+  <br>
+    <button  id="isleft" style="display:block;" onclick="isLeft()">LIGAMED on left foot</button>
+    <button  id="isright" style="display:block;" onclick="isRight()">LIGAMED on right foot</button>
+  <br>
   <br>
     <td><button  id="breakbutton" style="display:block;" onclick="breakGAIT()">Begin training GAIT</button></td>
     <td><button  id="resumebutton" style="display:none;" onclick="resumeGAIT()">End training GAIT</button></td>
   <br>
     <td><button  id="togglestepon" style="display:block;" onclick="stepToggleOn()">Train steps</button></td>
     <td><button  id="beginstep" style="display:none;" onclick="beginStep()">Begin step</button></td>
+    <br>
     <td><button  id="togglestepoff" style="display:none;" onclick="stepToggleOff()">Stop training steps</button></td>
   <br>
-    <br>
+  <br>
     <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
+    <br>
     <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
-    <br>
-    <br>
+  <br>
+  <br>
     <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
+    <br>
     <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
   <br>
 
@@ -109,7 +117,7 @@
     <img src="gait_cycle.jpg" width="600">
   <br>
   <br>
-  <center>
+
     <p style="width:500px; font-size:5px;"> 
       Warning: Pregnant women, the elderly, and children under 10 should avoid prolonged exposure to Ligamed.
       Caution: Ligamed may suddenly accelerate to dangerous speeds.
@@ -119,7 +127,6 @@
       If Ligamed begins to smoke, get away immediately. Seek shelter and cover head.
       Ligamed may stick to certain types of skin.
       When not in use, Ligamed should be returned to its special container and kept in a cool, dark location at least 20 feet away from any metal object. Failure to do so relieves the makers of Ligamed of any and all liability.
-      Ligamed has been shipped to our troops in Syria and is being dropped by our warplanes on ISIS.
       Do not taunt Ligamed.
       Ligamed comes with a lifetime warranty.
       Thank you for choosing Ligamed.
@@ -435,7 +442,21 @@ function savedatalocal(){
 localStorage.setItem("ligamedData", JSON.stringify(fullArray));
 }
 
+function isLeft(){
+    var x = document.getElementById("isleft");
+    x.style.display = "none";
+    var y = document.getElementById("isright");
+    y.style.display = "none";
+    fullArray.push("isLeft")
+}
 
+function isRight(){
+    var x = document.getElementById("isleft");
+    x.style.display = "none";
+    var y = document.getElementById("isright");
+    y.style.display = "none";
+    fullArray.push("isRight")
+}
 
 </script>
 </html>
