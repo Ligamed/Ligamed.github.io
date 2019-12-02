@@ -150,9 +150,20 @@ function stuffEverythingHere() {
   		angleMovedRight.push(angleIntegrate(trainRightArray));
 
   	} 	
-  }
-	var averagedLeftRoll = angleAverage(angleMovedLeft);
+  }	
+  	var averagedLeftRoll = angleAverage(angleMovedLeft);
 	var averagedRightRoll = angleAverage(angleMovedRight);
+  	if(loadedtrainingdata == 0){
+
+  	localStorage.setItem("averagedLeftRollVal", JSON.stringify(averagedLeftRoll));
+  	localStorage.setItem("averagedRightRollVal", JSON.stringify(averagedRightRoll));
+	}
+	if(loadedtrainingdata == 1){
+		averagedLeftRoll = trainedLeftRoll
+		averagedRightRoll = trainedRightRoll
+	}
+
+
 
 	document.getElementById("trainedleftdegrees").innerHTML = averagedLeftRoll;
   	document.getElementById("trainedrightdegrees").innerHTML = averagedRightRoll;
@@ -224,12 +235,20 @@ function stuffEverythingHere() {
 	var averagedMaxGAIT = angleAverage(avgMaxGAIT);
 	var averagedMinGAIT = angleAverage(avgMinGAIT);
 
-  	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
+  	
   	if(loadedtrainingdata == 0){
-  	localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
-  	localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
+  		localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
+  		localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
 	}
 
+	if(loadedtrainingdata == 1){
+		averagedMinGAIT = trainedMinRoll
+		averagedMaxGAIT = trainedMaxRoll
+	}
+
+
+
+	var sprainFactor = riskAnalysis(fullArray,averagedMinGAIT,averagedMaxGAIT);
 	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
 	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
 	document.getElementById("textSprain").innerHTML = sprainFactor;
@@ -358,9 +377,9 @@ function stuffEverythingHere() {
 
 	
 	//adds table
-		var headingsArray = trimmedArray;
+		headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value","isRisk"]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","PredictedImpact","Value","isRisk","X Acceleration Z-Score","Roll Velocity Z-Score","Roll Angle Z-Score" ]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -689,8 +708,10 @@ function loadLocalDataSteps(){
 	for (var i = 0; i <= trainedZscoreVals.length - 1; i++) {
 		 trainedZscoreVals[i] = Number(trainedZscoreVals[i]);
 	}
-
+	trainedLeftRoll = JSON.parse(localStorage.getItem("averagedLeftRollVal") || "[]");
+	trainedRightRoll = JSON.parse(localStorage.getItem("averagedRightRollVal") || "[]");
 	loadedtrainingdata = 1;
+
 }
 
 
@@ -707,7 +728,7 @@ function toggleTable() {
 
 //saves data to csv file
 function saveTextAsFile(){
-	var headingsArray = fullArray;
+	//var headingsArray = trimmedArray;
 	//headingsArray.reverse();
 	//headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
 	//headingsArray.reverse();
