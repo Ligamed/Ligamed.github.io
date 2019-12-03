@@ -167,10 +167,7 @@ function stuffEverythingHere() {
   }	
 	averagedLeftRoll = angleAverage(angleMovedLeft);
 	averagedRightRoll = angleAverage(angleMovedRight);
-  	if(loadedtrainingdata == 0){
 
-
-	}
 	if(loadedtrainingdata == 1){
 		averagedLeftRoll = trainedLeftRoll
 		averagedRightRoll = trainedRightRoll
@@ -235,10 +232,6 @@ function stuffEverythingHere() {
 	averagedMaxGAIT = angleAverage(avgMaxGAIT);
 	averagedMinGAIT = angleAverage(avgMinGAIT);
 
-  	
-  	if(loadedtrainingdata == 0){
-
-	}
 
 	if(loadedtrainingdata == 1){
 		averagedMinGAIT = trainedMinRoll
@@ -576,7 +569,7 @@ function checkAngle(inputArray){
 
 }
 
-
+/*
 //checks chance of sprain. This has taken far too long to get. Neil provided pseudocode for this section
 function riskAnalysis(inputArray,min,max){
 	var countOut = 0;
@@ -594,6 +587,7 @@ function riskAnalysis(inputArray,min,max){
 	var percentageOut = countOut / (countIn + countOut)
 	return percentageOut	
 }
+*/
 
 //Checks if instance within normal bounds. Neil provided pseudocode for this section. I think the numbers came from a few of the trials him and Akshay were running
 function determineStep(inputArray){
@@ -606,7 +600,7 @@ function determineStep(inputArray){
 			//Mid Walking Stance
 			inputArray[i][12] = 0
 		}
-		else if(inputArray[i][7] < .9 && inputArray[i][8]> -15 && inputArray[i][8] < 25){
+		else if((inputArray[i][7] < .9) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
 			inputArray[i][12] = 0
 			
