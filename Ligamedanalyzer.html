@@ -56,10 +56,10 @@
 <br>
 <br>
 <p>Outwards</p>
-<div id="When running try rolling the foot more to the right"></div>
+<div id="outwardsRoll"></div>
 <br>
 <p>Inwards</p>
-<div id="When running try rolling the foot more to the left"></div>
+<div id="inwardsRoll"></div>
 <br>
 <br>
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
@@ -70,7 +70,6 @@
         <td><input type="file" id="fileToLoad"></td>
         <td><button onclick="loadFileAsText()">Load Selected File</button><td>
     </tr>
-    <p id="temparray"></p>
     <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
@@ -166,12 +165,11 @@ function stuffEverythingHere() {
 
   	} 	
   }	
-  	var averagedLeftRoll = angleAverage(angleMovedLeft);
-	var averagedRightRoll = angleAverage(angleMovedRight);
+	averagedLeftRoll = angleAverage(angleMovedLeft);
+	averagedRightRoll = angleAverage(angleMovedRight);
   	if(loadedtrainingdata == 0){
 
-  	localStorage.setItem("averagedLeftRollVal", JSON.stringify(averagedLeftRoll));
-  	localStorage.setItem("averagedRightRollVal", JSON.stringify(averagedRightRoll));
+
 	}
 	if(loadedtrainingdata == 1){
 		averagedLeftRoll = trainedLeftRoll
@@ -234,13 +232,12 @@ function stuffEverythingHere() {
   	}
   } 	
 
-	var averagedMaxGAIT = angleAverage(avgMaxGAIT);
-	var averagedMinGAIT = angleAverage(avgMinGAIT);
+	averagedMaxGAIT = angleAverage(avgMaxGAIT);
+	averagedMinGAIT = angleAverage(avgMinGAIT);
 
   	
   	if(loadedtrainingdata == 0){
-  		localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
-  		localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
+
 	}
 
 	if(loadedtrainingdata == 1){
@@ -266,7 +263,9 @@ function stuffEverythingHere() {
   			i = 1+i;
   				if (fullArray[i][0] == "resumeStep") {j=0;}
   				else{
-  				trainStepData.push(fullArray[i]);
+  					if (fullArray[i][11] == 1){
+  						trainStepData.push(fullArray[i]);
+  					}
   				}
 
   			}
@@ -314,7 +313,7 @@ function stuffEverythingHere() {
 		trainvelX[i] = trainStepData[i][4];
 		trainvelY[i] = trainStepData[i][5];
 		trainvelZ[i] = trainStepData[i][6];
-		trainmagAcc[i] = trainStepData[i][7];
+		trainmagAcc[i] = Number(trainStepData[i][7]);
 		trainangX[i] = Number(trainStepData[i][8]);
 		trainangY[i] = Number(trainStepData[i][9]);
 		trainangZ[i] = Number(trainStepData[i][10]);
@@ -323,22 +322,32 @@ function stuffEverythingHere() {
 
 	if (loadedtrainingdata == 0) {
 
+		mag_MED = getMedian(trainmagAcc)
+		mag_MAD = getMAD(trainmagAcc)
+
 		angX_MED = getMedian(trainangX)
 		angX_MAD = getMAD(trainangX)
 
-		localStorage.setItem("saveZscoreVals", JSON.stringify([angX_MED,angX_MAD]));
+
+
 	}
 
   	if(loadedtrainingdata == 1){
-		angX_MED = trainedZscoreVals[1]
-		angX_MAD = trainedZscoreVals[2]
+  		mag_MED = trainedZscoreVals[0]
+		mag_MAD = trainedZscoreVals[1]
+
+		angX_MED = trainedZscoreVals[2]
+		angX_MAD = trainedZscoreVals[3]
+
 	}
 
 
 	var THIRD_VAL = .6745
 
 	for (var i = 0; i <= trimmedArray.length - 1; i++) {
-		trimmedArray[i][13] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
+		trimmedArray[i][13] = getOutliers(trimmedArray[i][7],mag_MAD,mag_MED,THIRD_VAL)
+		trimmedArray[i][14] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
+
 	}
 
 /*
@@ -358,10 +367,21 @@ function stuffEverythingHere() {
 	}
 */
 	isProblem = []
+
 	for (var i = 0; i <= trimmedArray.length-1; i++) {
-		if (trimmedArray[i][12]==1 && trimmedArray[i][13] > 3)
-			isProblem.push(trimmedArray[i])
+		if (trimmedArray[i][12]==1){
+			if(Math.abs(trimmedArray[i][13]) > 3){
+				if(trimmedArray[i][14] > 3){
+					isProblem.push([trimmedArray[i][0],trimmedArray[i][7],trimmedArray[i][8],"right"])
+				}
+				if(trimmedArray[i][14] < -3){
+					isProblem.push([trimmedArray[i][0],trimmedArray[i][7],trimmedArray[i][8],"left"])
+				}
+			}
+		}
+			
 	}
+	console.log(isProblem)
 
 	var sprainFactor = riskAnalysis(isProblem,averagedMinGAIT,averagedMaxGAIT);
 	document.getElementById("textSprain").innerHTML = sprainFactor;
@@ -370,7 +390,7 @@ function stuffEverythingHere() {
 	//adds table
 		headingsArray = trimmedArray;
 		headingsArray.reverse();
-		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Roll Angle Z-Score" ]);
+		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Acceleration Magnitude Z-Score","Roll Angle Z-Score" ]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
 		//create a Table Object
@@ -610,6 +630,18 @@ function determineStep(inputArray){
 
 //-----------------------------------------------------------------------------------------
 //Utility functions below
+
+function savedatalocal(){
+	localStorage.setItem("saveZscoreVals", JSON.stringify([mag_MED,mag_MAD,angX_MED,angX_MAD]));
+	localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
+  	localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
+  	localStorage.setItem("averagedLeftRollVal", JSON.stringify(averagedLeftRoll));
+  	localStorage.setItem("averagedRightRollVal", JSON.stringify(averagedRightRoll));
+}
+
+
+
+
 
 // Loads data from localdata
 function loadLocalData(){
