@@ -81,40 +81,29 @@
     <div id="graph2box" style="width:100%;height:200px;margin-top:20px;margin-bottom:5px;display:none;">
       <div id="graph2" style="width:1400px;height:200px;"></div>
     </div>
+
   <br>
-    <button  id="isleft" style="display:block;" onclick="isLeft()">LIGAMED on left foot</button>
-    <button  id="isright" style="display:block;" onclick="isRight()">LIGAMED on right foot</button>
-  <br>
-  <br>
-    <td><button  id="breakbutton" style="display:block;" onclick="breakGAIT()">Begin training GAIT</button></td>
-    <td><button  id="resumebutton" style="display:none;" onclick="resumeGAIT()">End training GAIT</button></td>
-  <br>
+  <td>
     <td><button  id="togglestepon" style="display:block;" onclick="stepToggleOn()">Train steps</button></td>
     <td><button  id="beginstep" style="display:none;" onclick="beginStep()">Begin step</button></td>
-    <br>
+    <br id="breakinbuttons" style="display:none;">
     <td><button  id="togglestepoff" style="display:none;" onclick="stepToggleOff()">Stop training steps</button></td>
   <br>
-  <br>
-    <td><button  id="breakleftbutton" style="display:block;" onclick="breakleft()">Begin training roll left</button></td>
-    <br>
+  <tr>
+    <td><button  id="breakleftbutton" style="display:inline-block;" onclick="breakleft()">Begin training roll left</button></td>
+
     <td><button  id="resumeleftbutton" style="display:none;" onclick="resumeleft()">End training roll left</button></td>
-  <br>
-  <br>
-    <td><button id="breakrightbutton" style="display:block;" onclick="breakright()">Begin training roll right</button></td>
-    <br>
+
+    <td><button id="breakrightbutton" style="display:inline-block;" onclick="breakright()">Begin training roll right</button></td>
+
     <td><button id="resumerightbutton" style="display:none;" onclick="resumeright()">End training roll right</button></td>
-  <br>
+
+  </tr>
 
   <br>
-    <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
-    <br>
-    <br>
-    <a href="https://ligamed.github.io/Ligamedanalyzer.html">Analyze Data</a>
+    
     <p><button onclick="savedatalocal()" type="button">Click to Save for Analyzer</button></p>
-
-  <br>
-  <br>
-    <img src="gait_cycle.jpg" width="600">
+    <a href="https://ligamed.github.io/Ligamedanalyzer.html">Analyze Data</a>
   <br>
   <br>
 
@@ -231,8 +220,12 @@ function handleData(event) {
   updateData2(x2,y2,z2);
 
   //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
+  //ah the original sprain calculation formula. Simpler times...
 
+  //adds a timestamp
   var currenttime = event.timeStamp.toFixed(2);
+
+  //for training impacts of steps. Sets the button to signal impacts are being recorded for 3.5 seconds
   if (isImpact == 1) {
     if(currenttime - starttime > 350){
       isImpact = 0
@@ -242,6 +235,8 @@ function handleData(event) {
   //saves values to a new line in the giant matrix
   //console.log(fullArray)
 }
+
+
 // disconnect function:
 function disconnect() {
   if (myDevice) {
@@ -249,6 +244,8 @@ function disconnect() {
     myDevice.gatt.disconnect();
   }
 }
+
+
 // Handle Arduino client input data
 function updateData1(x1,y1,z1) {
   graphData1.x.push(x1);graphData1.y.push(y1);graphData1.z.push(z1);
@@ -257,6 +254,7 @@ function updateData1(x1,y1,z1) {
   // Update graph
   Plotly.update('graph1', {y: [graphData1.x,graphData1.y,graphData1.z]});
 }
+
 // Handle Arduino client input data
 function updateData2(x2,y2,z2) {
   graphData2.x.push(x2);graphData2.y.push(y2);graphData2.z.push(z2);
@@ -265,6 +263,8 @@ function updateData2(x2,y2,z2) {
   // Update graph
   Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
 }
+
+//graph. Still mostly the original code
 function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -314,6 +314,8 @@ function initGraph2(){
 initGraph1();
 initGraph2();
 
+/*
+Being done from analyzer site from now on
 //saves data to a file
 function saveTextAsFile(){
   var headingsArray = fullArray;
@@ -335,7 +337,7 @@ function saveTextAsFile(){
   link.click(); // This will download the data file named "ligamed_data.csv".
 
 }
-
+*/
 
 //this was in the saving example. Not 100% sure why its needed
 function destroyClickedElement(event)
@@ -343,7 +345,8 @@ function destroyClickedElement(event)
     document.body.removeChild(event.target);
 }
 
-
+/*
+No longer used. Using trained roll for angles instead of testing walk
 //adds array line of where training data starts/stops. also toggles training buttons on/off accordingly
 function breakGAIT(){
     fullArray.push(["breakGAIT"]);
@@ -359,7 +362,7 @@ function resumeGAIT(){
     var y = document.getElementById("resumebutton");
     y.style.display = "none";
   }
-
+*/
 var isImpact = 0
 
 function stepToggleOn(){
@@ -369,7 +372,9 @@ function stepToggleOn(){
     var y = document.getElementById("beginstep");
     y.style.display = "block";
     var z = document.getElementById("togglestepoff");
-    z.style.display = "block";    
+    z.style.display = "block";
+    var z = document.getElementById("breakinbuttons");
+    z.style.display = "block";        
   }
 function stepToggleOff(){
     fullArray.push(["resumeStep"]);
@@ -379,6 +384,8 @@ function stepToggleOff(){
     y.style.display = "none";
     var x = document.getElementById("beginstep");
     x.style.display = "none";
+    var z = document.getElementById("breakinbuttons");
+    z.style.display = "none";  
 
     isImpact = 0
   }
@@ -397,7 +404,7 @@ function breakleft(){
     var x = document.getElementById("breakleftbutton");
     x.style.display = "none";
     var y = document.getElementById("resumeleftbutton");
-    y.style.display = "block";
+    y.style.display = "inline-block";
     var a = document.getElementById("breakrightbutton");
     a.style.display = "none";
     var b = document.getElementById("resumerightbutton");
@@ -406,11 +413,11 @@ function breakleft(){
 function resumeleft(){
     fullArray.push(["resumeleft"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "block";
+    x.style.display = "inline-block";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
-    a.style.display = "block";
+    a.style.display = "inline-block";
     var b = document.getElementById("resumerightbutton");
     b.style.display = "none";
   }
@@ -424,16 +431,16 @@ function breakright(){
     var a = document.getElementById("breakrightbutton");
     a.style.display = "none";
     var b = document.getElementById("resumerightbutton");
-    b.style.display = "block";
+    b.style.display = "inline-block";
   }
 function resumeright(){
     fullArray.push(["resumeright"]);
     var x = document.getElementById("breakleftbutton");
-    x.style.display = "block";
+    x.style.display = "inline-block";
     var y = document.getElementById("resumeleftbutton");
     y.style.display = "none";
     var a = document.getElementById("breakrightbutton");
-    a.style.display = "block";
+    a.style.display = "inline-block";
     var b = document.getElementById("resumerightbutton");
     b.style.display = "none";
   }
@@ -442,6 +449,9 @@ function savedatalocal(){
 localStorage.setItem("ligamedData", JSON.stringify(fullArray));
 }
 
+
+/*
+No used. This code was only used for like 1 day :( so much waste
 function isLeft(){
     var x = document.getElementById("isleft");
     x.style.display = "none";
@@ -457,6 +467,6 @@ function isRight(){
     y.style.display = "none";
     fullArray.push("isRight")
 }
-
+*/
 </script>
 </html>
