@@ -77,10 +77,12 @@
 </div>
 <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
-
+<p><button onclick="toggleTable2()" type="button">Click for Problem Data</button></p>
 </center>
 <div id="longTable" style="display:none;width:100px;height:200px;"></div>
+<br>
 
+<div id="longTable2" style="display:none;width:100px;height:200px;"></div>
 
 </body>
 <script type="text/javascript">
@@ -439,6 +441,30 @@ function stuffEverythingHere() {
 	var sprainFactor = riskAnalysis(isProblem,averagedLeftRoll,averagedRightRoll);
 	document.getElementById("textSprain").innerHTML = sprainFactor;
 
+		//adds table
+		headingsArray2 = isProblem;
+		headingsArray2.reverse();
+		headingsArray2.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Acceleration Magnitude Z-Score","Roll Angle Z-Score" ]);
+		headingsArray2.reverse();
+		var tableArr2 = headingsArray2
+		//https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
+		//create a Table Object
+		let table2 = document.createElement('table');
+		//iterate over every array(row) within tableArr
+		for (let row of tableArr2) {
+		//Insert a new row element into the table element
+		  table2.insertRow();
+		//Iterate over every index(cell) in each array(row)
+		  for (let cell of row) {
+		//While iterating over the index(cell)
+		//insert a cell into the table element
+		    let newCell = table2.rows[table2.rows.length - 1].insertCell();
+		//add text to the created cell element
+		    newCell.textContent = cell;
+		  }
+		}
+		//append the compiled table to the DOM
+		document.getElementById("longTable2").appendChild(table2);		
 
 
 
@@ -645,12 +671,12 @@ function riskAnalysis(inputArray,min,max){
 		document.getElementById("resultimage").src = "roll_right.jpg";
 		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe rIgHt mOrE";
 	}
-	else if (numberOfRights > 0){
+	if (numberOfRights > 0){
 		document.getElementById("resultimage").src = "roll_left.jpg";
 		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe lEfT mOrE";
 	}
 
-	else if (numberOfRights > 0 && numberOfLefts > 0){
+	if (numberOfRights > 0 && numberOfLefts > 0){
 		document.getElementById("resultimage").src = "roll_both.jpg";
 		document.getElementById("resulttext").innerHTML = "rOlL yOuR fOoT lEsS";
 	}
@@ -753,6 +779,15 @@ function toggleTable() {
     x.style.display = "block";
   } else {
     x.style.display = "none";
+  }
+}
+function toggleTable2() {
+
+  var y = document.getElementById("longTable2");
+  if (y.style.display === "none") {
+    y.style.display = "block";
+  } else {
+    y.style.display = "none";
   }
 }
 
