@@ -128,7 +128,7 @@ function stuffEverythingHere() {
 
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
-	
+	walkingOrRunning = ""
 	//Since we aren't tracking left/right foot, this code was able to be repurposed
 	for (var i = 0; i <= fullArray.length-1; i++) {
   		if (fullArray[i][0] == "isleft") {
@@ -276,7 +276,7 @@ function stuffEverythingHere() {
 	trimmedArray = [];
 
 	//removes text and NaN's from data
-  	for (var i = 0; i <= fullArray.length-1; i++){
+  	for (var i = 50; i <= fullArray.length-1; i++){
   		var currentLine = []
   		currentLine = fullArray[i];
   		//currentLine.push(0,0,0,0)
