@@ -82,6 +82,11 @@
       <div id="graph2" style="width:1400px;height:200px;"></div>
     </div>
 
+
+  <br>
+    <button  id="isleft" style="display:inline-block;" onclick="isLeft()">Walking</button>
+    <button  id="isright" style="display:inline-block;" onclick="isRight()">Running</button>
+  <br>
   <br>
   <td>
     <td><button  id="togglestepon" style="display:block;" onclick="stepToggleOn()">Train steps</button></td>
@@ -450,8 +455,9 @@ localStorage.setItem("ligamedData", JSON.stringify(fullArray));
 }
 
 
-/*
-No used. This code was only used for like 1 day :( so much waste
+
+//technically being used for determining if user is running/walking, but I really don't feel like changing this many names and causing more bugs
+//user walking
 function isLeft(){
     var x = document.getElementById("isleft");
     x.style.display = "none";
@@ -459,7 +465,7 @@ function isLeft(){
     y.style.display = "none";
     fullArray.push("isLeft")
 }
-
+//user running
 function isRight(){
     var x = document.getElementById("isleft");
     x.style.display = "none";
@@ -467,6 +473,6 @@ function isRight(){
     y.style.display = "none";
     fullArray.push("isRight")
 }
-*/
+
 </script>
 </html>
