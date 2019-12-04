@@ -435,7 +435,7 @@ function stuffEverythingHere() {
 		}
 			
 	}
-
+	console.log(isProblem)
 	var sprainFactor = riskAnalysis(isProblem,averagedLeftRoll,averagedRightRoll);
 	document.getElementById("textSprain").innerHTML = sprainFactor;
 
@@ -638,9 +638,9 @@ function riskAnalysis(inputArray,min,max){
 		else if(inputArray[i][20] == "right"){
 			numberOfRights += 1	
 		}
-		totalzscore += Math.abs(inputArray[i][14])
+		totalzscore += Math.abs(inputArray[i][14]) * Math.abs(inputArray[i][13])
 	}
-	var percentageOut = (totalzscore)/(trimmedArray.length/10)
+	var percentageOut = (totalzscore)/(trimmedArray.length)
 	if (numberOfLefts > 0){
 		document.getElementById("resultimage").src = "roll_right.jpg";
 		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe rIgHt mOrE";
