@@ -63,7 +63,7 @@
 <img id="resultimage" src="" width="600">
 
 <br>
-
+<div id = "saveloadbuttonstoggle" style = "display:none">
 <td><button onclick="saveTextAsFile()">Save Data to File</button></td>
    <br>
    <br>
@@ -73,8 +73,9 @@
         <td><button onclick="loadFileAsText()">Load Selected File</button><td>
     </tr>
 
-    <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 
+</div>
+<p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
 
 </center>
@@ -128,19 +129,16 @@ function stuffEverythingHere() {
 	 //integrates angles
 	fullArray = checkAngle(fullArray);
 	
-
-	/*
-	var leftOrRight = ""
-
+	//Since we aren't tracking left/right foot, this code was able to be repurposed
 	for (var i = 0; i <= fullArray.length-1; i++) {
   		if (fullArray[i][0] == "isleft") {
-  			leftOrRight = "left"
+  			walkingOrRunning = "walking"
   		}
   		if (fullArray[i][0] == "isRight") {
-  			leftOrRight = "right"
+  			walkingOrRunning = "running"
   		}  		
   	}
-	*/
+	
   var angleMovedLeft =[];
   var angleMovedRight = [];
   //sets roll training data to its own arrays
@@ -483,11 +481,6 @@ function getOutliers(inputVal,MAD,MEDIAN,THIRD_VAL){
 }
 
 
-
-
-
-
-
 //-----------------------------------------------------------------------------------------
 //computation functions below
 
@@ -554,7 +547,6 @@ function angleAverage(inputArray){
 	return x;
 }
 
-
 //Akshay is helping
 function accMagnitude(x,y,z){
 	var m = 0;
@@ -564,7 +556,6 @@ function accMagnitude(x,y,z){
 	m = Math.sqrt((x+y+z));
 	m = m.toFixed(2);
 	return m;
-
 }
 
 //Integrates the anglular velocity over time to get the angle moved
@@ -634,10 +625,7 @@ function riskAnalysis(inputArray,min,max){
 
 var numberOfLefts = 0
 var numberOfRights = 0
-var numberofMajorLefts = 0
-var numberofMajorRights = 0
-var numberofMinorLefts = 0
-var numberofMinorRights = 0
+
 
 //new riskAnalysis function because I am too lazy to fix the other code dependant on some of these names
 //also I got a bit carried away in this function and now it also controls most of the output
@@ -646,21 +634,9 @@ function riskAnalysis(inputArray,min,max){
 	for (var i = 0; i <= inputArray.length - 1; i++) {
 		if(inputArray[i][20] == "left"){
 			numberOfLefts += 1
-				if(inputArray[i][14] > 6){
-					numberofMajorLefts += 1
-				}
-				else {
-					numberofMinorLefts += 1
-				}
 		}
 		else if(inputArray[i][20] == "right"){
-			numberOfRights += 1
-				if(inputArray[i][14] > 6){
-					numberofMajorRights += 1
-				}
-				else {
-					numberofMinorRights += 1
-				}			
+			numberOfRights += 1	
 		}
 		totalzscore += Math.abs(inputArray[i][14])
 	}
@@ -671,7 +647,7 @@ function riskAnalysis(inputArray,min,max){
 	}
 	else if (numberOfRights > 0){
 		document.getElementById("resultimage").src = "roll_left.jpg";
-		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe lEfT  mOrE";
+		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe lEfT mOrE";
 	}
 
 	else if (numberOfRights > 0 && numberOfLefts > 0){
@@ -691,21 +667,42 @@ function riskAnalysis(inputArray,min,max){
 
 //Checks if instance within normal bounds. Neil provided pseudocode for this section and then edited it some more. I think the numbers came from a few of the trials him and Akshay were running
 function determineStep(inputArray){
-	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95 && inputArray[i][8] < 3 && inputArray[i][8] > -3) {
-			//Standing
-			inputArray[i][12] = 0
-		}
-		else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
-			//Mid Walking Stance
-			inputArray[i][12] = 0
-		}
-		else if((inputArray[i][7] < .9) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
+	if(walkingOrRunning == "running"){
+		for (var i = 50; i <= inputArray.length - 1; i++) {
+			if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95 && inputArray[i][8] < 3 && inputArray[i][8] > -3) {
+				//Standing
+				inputArray[i][12] = 0
+			}
+			else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
+				//Mid Walking Stance
+				inputArray[i][12] = 0
+			}
+			else if((inputArray[i][7] < .9) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
-			inputArray[i][12] = 0	
+				inputArray[i][12] = 0	
+			}
+			else{
+				inputArray[i][12] = 1
+			}
 		}
-		else{
-			inputArray[i][12] = 1
+	}
+	else {
+		for (var i = 50; i <= inputArray.length - 1; i++) {
+			if (inputArray[i][7] < 1.05 && inputArray[i][7] > .95 && inputArray[i][8] < 3 && inputArray[i][8] > -3) {
+				//Standing
+				inputArray[i][12] = 0
+			}
+			else if(inputArray[i][7] > 1.1 && inputArray[i][8] > 3 && inputArray[i][8] < -3){
+				//Mid Walking Stance
+				inputArray[i][12] = 0
+			}
+			else if((inputArray[i][7] < .9) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
+			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
+				inputArray[i][12] = 0	
+			}
+			else{
+				inputArray[i][12] = 1
+			}
 		}
 	}
 	return inputArray
@@ -716,7 +713,7 @@ function determineStep(inputArray){
 //-----------------------------------------------------------------------------------------
 //Utility functions below
 
-//function dataClear() {localStorage.clear()}
+function dataClear() {localStorage.clear()}
 
 //saves training data so it doesn't have to be done for each run
 function savedatalocal(){
@@ -785,13 +782,16 @@ function saveTextAsFile(){
 function runData(){
 	var x = document.getElementById("line1");
     var y = document.getElementById("line2");
+    var z = document.getElementById("saveloadbuttonstoggle");
     if (x.style.display === "none") {
     	x.style.display = "block";
     	y.style.display = "block";
+    	z.style.display = "block";
     }
     else {
     x.style.display = "none";
     y.style.display = "none";
+    z.style.display = "none";
     }
 
 }
