@@ -750,7 +750,7 @@ function determineStep(inputArray){
 				//Mid Walking Stance
 				inputArray[i][12] = 0
 			}
-			else if((inputArray[i][7] < -6.2) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
+			else if((inputArray[i][7] < .92 || inputArray[i][7] > 4) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
 				inputArray[i][12] = 0	
 			}
@@ -769,7 +769,7 @@ function determineStep(inputArray){
 				//Mid Walking Stance
 				inputArray[i][12] = 0
 			}
-			else if((inputArray[i][7] < .9) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
+			else if((inputArray[i][7] <) && (inputArray[i][8]> averagedLeftRoll) && (inputArray[i][8] < averagedRightRoll)){
 			//Step Occurs Here, this is where our risk is determined since this is where the foot lands
 				inputArray[i][12] = 0	
 			}
