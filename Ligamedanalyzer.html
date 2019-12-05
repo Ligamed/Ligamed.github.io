@@ -16,6 +16,8 @@
     text-decoration: none; font-size: 8px; margin: 4px 10px; height: 16px; width: 16px;
     border-radius: 50%; outline:none; font-family: 'Open Sans', sans-serif;
   }
+  button {background: #e7e7e7; background-color: #e7e7e7; border: 1px solid black; }
+  button:hover {background-color: #100063; color: white;}  
   table, th, td {border: 1px solid black; border-collapse: collapse;}
   th, td {padding: 2px;}
   .runbutton {
@@ -31,13 +33,13 @@
 </head>
 <body>
 <center>
-<p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo_II.jpg" width="600"> </button></p>
+<p><button onclick="runData()" class="runbutton"> <img src="Ligamed_logo_II.jpg" width="400"> </button></p>
 <h1 id="line1" style = "display:none">LIGAMED!</h1>
 <h4 id="line2" style = "display:none">THE WORLD'S FIRST ANKLE ANALYST-THERAPIST</h4>
 <br>
-<p><button onclick="loadLocalData()" type="button">Click to Load</button></p>
-<p><button onclick="loadLocalDataSteps()" type="button">Click to Load Trained Steps</button></p>
-<p><button onclick="stuffEverythingHere()" type="button">Click Run</button></p>
+<button onclick="loadLocalData()"  style="display:inline-block;" type="button">Click to Load</button>
+<button onclick="loadLocalDataSteps()" style="display:inline-block;" type="button">Click to Load Trained Steps</button>
+<p><button onclick="stuffEverythingHere()"  type="button">Click Run</button></p>
 <p><button onclick="dataClear()" type="button">Click to clear</button></p>
 <br>
     <table style="width:400px;height:100px">
@@ -60,7 +62,7 @@
 
 <p>Suggested Change to GAIT:</p>
 <div id="resulttext"></div>
-<img id="resultimage" src="" width="600">
+<img id="resultimage" src="" width="200">
 
 <br>
 <div id = "saveloadbuttonstoggle" style = "display:none">
@@ -76,16 +78,16 @@
 
 </div>
 <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
-<p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
-<p><button onclick="toggleTable2()" type="button">Click for Problem Data</button></p>
-<center>
-<p><button onclick="toggleTable3()" type="button">Click for Overall Improvement</button></p>
+<button onclick="toggleTable()" style="display:inline-block;" type="button">Click for Raw Data</button>
+<button onclick="toggleTable2()"  style="display:inline-block;" type="button">Click for Problem Data</button>
+<button onclick="toggleTable3()" style="display:inline-block;" type="button">Click for Overall Improvement</button>
 
 </center>
+<br>
 <div id="longTable" style="display:none;width:100px;height:200px;"></div>
 <div id="longTable2" style="display:none;width:100px;height:200px;"></div>
 <center>
-<div id="longTable3" style="display:none;width:100px;height:200px;"></div>
+<div id="longTable3" style="display:none;width:100px;height:200px"></div>
 </center>
 </body>
 <script type="text/javascript">
@@ -652,13 +654,14 @@ function riskAnalysis(inputArray,min,max){
 }
 */
 
-var numberOfLefts = 0
-var numberOfRights = 0
+
 
 
 //new riskAnalysis function because I am too lazy to fix the other code dependant on some of these names
 //also I got a bit carried away in this function and now it also controls most of the output
 function riskAnalysis(inputArray,min,max){
+	var numberOfLefts = 0
+	var numberOfRights = 0
 	var totalzscore = 0
 	for (var i = 0; i <= inputArray.length - 1; i++) {
 		if(inputArray[i][20] == "left"){
@@ -675,7 +678,7 @@ function riskAnalysis(inputArray,min,max){
 		document.getElementById("resultimage").src = "roll_right.jpg";
 		document.getElementById("resulttext").innerHTML = "Keep your foot to the right more";
 	}
-	if (numberOfRights > 0 || numberOfRights / numberOflefts > 3){
+	if (numberOfRights > 0 || numberOfRights / numberOfLefts > 3){
 		document.getElementById("resultimage").src = "roll_left.jpg";
 		document.getElementById("resulttext").innerHTML = "Keep your foot to the left more";
 	}
