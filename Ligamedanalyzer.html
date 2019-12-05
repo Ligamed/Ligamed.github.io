@@ -669,21 +669,21 @@ function riskAnalysis(inputArray,min,max){
 	var percentageOut = (totalzscore)/(trimmedArray.length)
 	if (numberOfLefts > 0){
 		document.getElementById("resultimage").src = "roll_right.jpg";
-		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe rIgHt mOrE";
+		document.getElementById("resulttext").innerHTML = "Keep your foot to the right more";
 	}
 	if (numberOfRights > 0){
 		document.getElementById("resultimage").src = "roll_left.jpg";
-		document.getElementById("resulttext").innerHTML = "kEeP yOuR fOoT tO tHe lEfT mOrE";
+		document.getElementById("resulttext").innerHTML = "Keep your foot to the left more";
 	}
 
 	if (numberOfRights > 0 && numberOfLefts > 0){
 		document.getElementById("resultimage").src = "roll_both.jpg";
-		document.getElementById("resulttext").innerHTML = "rOlL yOuR fOoT lEsS";
+		document.getElementById("resulttext").innerHTML = "Stop rolling your foot left and right";
 	}
 
 	else{
 		document.getElementById("resultimage").src = "roll_good.jpg";
-		document.getElementById("resulttext").innerHTML = "gOoD aNaKiN gOoD";
+		document.getElementById("resulttext").innerHTML = "Your GAIT is good";
 	}
 
 	return percentageOut	
