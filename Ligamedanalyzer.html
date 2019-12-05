@@ -52,12 +52,10 @@
         <th>Right Roll</th>
         <th id="trainedrightdegrees"></th>
       </tr>
-      <!---
       <tr>
         <th>Sprain Risk Factor</th>
         <th id="textSprain"></th>
       </tr>      
-      --->
     </table>
 
 <p>Suggested Change to GAIT:</p>
@@ -80,12 +78,15 @@
 <p><button onclick="savedatalocal()" type="button">Click to Save Trained Data</button></p>
 <p><button onclick="toggleTable()" type="button">Click for Raw Data</button></p>
 <p><button onclick="toggleTable2()" type="button">Click for Problem Data</button></p>
+<center>
+<p><button onclick="toggleTable3()" type="button">Click for Overall Improvement</button></p>
+
 </center>
 <div id="longTable" style="display:none;width:100px;height:200px;"></div>
-<br>
-
 <div id="longTable2" style="display:none;width:100px;height:200px;"></div>
-
+<center>
+<div id="longTable3" style="display:none;width:100px;height:200px;"></div>
+</center>
 </body>
 <script type="text/javascript">
 
@@ -117,7 +118,7 @@ var trainangZ = [];
 var trainisImpact = [];
 
 var loadedtrainingdata = 0;
-
+var totalPercentageOut = []
 
 
 
@@ -666,14 +667,15 @@ function riskAnalysis(inputArray,min,max){
 		else if(inputArray[i][20] == "right"){
 			numberOfRights += 1	
 		}
-		totalzscore += Math.abs(inputArray[i][14]) * Math.abs(inputArray[i][13])
+		totalzscore += Math.pow((Math.abs(inputArray[i][14] - 2) * Math.abs(inputArray[i][13]) - 2),2)
 	}
-	var percentageOut = (totalzscore)/(trimmedArray.length)
-	if (numberOfLefts > 0){
+	var percentageOut = totalzscore / (trimmedArray.length)
+
+	if (numberOfLefts > 0 || numberOfLefts / numberOfRights > 3){
 		document.getElementById("resultimage").src = "roll_right.jpg";
 		document.getElementById("resulttext").innerHTML = "Keep your foot to the right more";
 	}
-	if (numberOfRights > 0){
+	if (numberOfRights > 0 || numberOfRights / numberOflefts > 3){
 		document.getElementById("resultimage").src = "roll_left.jpg";
 		document.getElementById("resulttext").innerHTML = "Keep your foot to the left more";
 	}
@@ -688,6 +690,46 @@ function riskAnalysis(inputArray,min,max){
 		document.getElementById("resulttext").innerHTML = "Your GAIT is optimal";
 	}
 	percentageOut = percentageOut.toFixed(4)
+	currenttime = new Date()
+
+
+	
+	totalPercentageOut = (JSON.parse(localStorage.getItem("savedPercentageOut") || "[]"));
+	if (totalPercentageOut == "[]"){
+		totalPercentageOut = [[currenttime,percentageOut]]
+	}
+	else{
+		totalPercentageOut.push([currenttime,percentageOut])
+	}
+	
+	localStorage.setItem("savedPercentageOut", JSON.stringify(totalPercentageOut));
+
+			//adds table
+		headingsArray3 = totalPercentageOut;
+		headingsArray3.reverse();
+		headingsArray3.push(["TimeStamp","Sprain Risk Factor"]);
+		headingsArray3.reverse();
+		var tableArr3 = headingsArray3
+		//https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
+		//create a Table Object
+		let table3 = document.createElement('table');
+		//iterate over every array(row) within tableArr
+		for (let row of tableArr3) {
+		//Insert a new row element into the table element
+		  table3.insertRow();
+		//Iterate over every index(cell) in each array(row)
+		  for (let cell of row) {
+		//While iterating over the index(cell)
+		//insert a cell into the table element
+		    let newCell = table3.rows[table3.rows.length - 1].insertCell();
+		//add text to the created cell element
+		    newCell.textContent = cell;
+		  }
+		}
+		//append the compiled table to the DOM
+		document.getElementById("longTable3").appendChild(table3);		
+
+
 	return percentageOut	
 }
 
@@ -793,6 +835,15 @@ function toggleTable2() {
   }
 }
 
+function toggleTable3() {
+
+  var y = document.getElementById("longTable3");
+  if (y.style.display === "none") {
+    y.style.display = "block";
+  } else {
+    y.style.display = "none";
+  }
+}
 //saves data to csv file
 function saveTextAsFile(){
 	//var headingsArray = trimmedArray;
