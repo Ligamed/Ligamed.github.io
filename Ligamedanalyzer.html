@@ -688,7 +688,7 @@ function riskAnalysis(inputArray,min,max){
 		document.getElementById("resulttext").innerHTML = "Stop rolling your foot left and right";
 	}
 
-	else{
+	if (numberOfRights == 0 || numberOfLefts ==0){
 		document.getElementById("resultimage").src = "roll_good.jpg";
 		document.getElementById("resulttext").innerHTML = "Your GAIT is optimal";
 	}
