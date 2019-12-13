@@ -111,7 +111,6 @@
     <a href="https://ligamed.github.io/Ligamedanalyzer.html">Analyze Data</a>
   <br>
   <br>
-
     <p style="width:500px; font-size:5px;"> 
       Warning: Pregnant women, the elderly, and children under 10 should avoid prolonged exposure to Ligamed.
       Caution: Ligamed may suddenly accelerate to dangerous speeds.
@@ -130,9 +129,6 @@
 </body>
 <script type = 'text/javascript'>
 
-
-
-
 //function to toggle graphs on/off. Saves processing power on weaker devices
 function togglegraph() {
   var x = document.getElementById("graph1box");
@@ -148,7 +144,9 @@ function togglegraph() {
     y.style.display = "none";
   }
 }
-//don't touch below here. I don't know what it does but it seems to be working
+
+//The code to make bluetooth work
+//From https://create.arduino.cc/projecthub/8bitkick/sensor-data-streaming-with-arduino-683a6c?ref=user&ref_id=453051&offset=0
 /*
 A Web Bluetooth connection example
 gathering three characteristics from a 3-axis accelerometer
@@ -202,12 +200,11 @@ function connect() {
     console.error('Connection failed!', error);
   });
 }
-//don't touch anything above here
 
 // handle incoming data:
 function handleData(event) {
   // get the data  from the peripheral:
-  var x1 = event.target.value.getInt16(0,true) / 1000; // true = byte order from Arduino is littleEndian
+  var x1 = event.target.value.getInt16(0,true) / 1000; //data comes in only as integers so decimal point must be re-added
   var y1 = event.target.value.getInt16(2,true) / 1000;
   var z1 = event.target.value.getInt16(4,true) / 1000;
   var x2 = event.target.value.getInt16(6,true) / 10;
@@ -225,9 +222,6 @@ function handleData(event) {
   updateData1(x1,y1,z1);
   updateData2(x2,y2,z2);
 
-  //if(x2>1000){document.getElementById("insertpercentage").innerHTML = x2 / 5000;}
-  //ah the original sprain calculation formula. Simpler times...
-
   //adds a timestamp
   var currenttime = event.timeStamp.toFixed(2);
 
@@ -237,13 +231,12 @@ function handleData(event) {
       isImpact = 0
     }
   }
-  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,0,0,0,0,isImpact]);
+
   //saves values to a new line in the giant matrix
-  //console.log(fullArray)
+  fullArray.push([currenttime,x1,y1,z1,x2,y2,z2,0,0,0,0,isImpact]);
 }
 
-
-// disconnect function:
+// disconnect function, from example
 function disconnect() {
   if (myDevice) {
     // disconnect:
@@ -251,8 +244,7 @@ function disconnect() {
   }
 }
 
-
-// Handle Arduino client input data
+// Handle Arduino client input data, from example
 function updateData1(x1,y1,z1) {
   graphData1.x.push(x1);graphData1.y.push(y1);graphData1.z.push(z1);
   // Only record last 200 entries
@@ -261,7 +253,6 @@ function updateData1(x1,y1,z1) {
   Plotly.update('graph1', {y: [graphData1.x,graphData1.y,graphData1.z]});
 }
 
-// Handle Arduino client input data
 function updateData2(x2,y2,z2) {
   graphData2.x.push(x2);graphData2.y.push(y2);graphData2.z.push(z2);
   // Only record last 200 entries
@@ -270,7 +261,7 @@ function updateData2(x2,y2,z2) {
   Plotly.update('graph2', {y: [graphData2.x,graphData2.y,graphData2.z]});
 }
 
-//graph. Still mostly the original code
+//graphs. Still mostly the original example
 function initGraph1(){
   var traceData=[];
   var properties = ["x","y","z"];
@@ -320,57 +311,9 @@ function initGraph2(){
 initGraph1();
 initGraph2();
 
-/*
-Being done from analyzer site from now on
-//saves data to a file
-function saveTextAsFile(){
-  var headingsArray = fullArray;
-  headingsArray.reverse();
-  headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
-  headingsArray.reverse();
-
-
-  let csvContent = "data:text/csv;charset=utf-8," 
-       + headingsArray.map(e => e.join(",")).join("\n");
-  var encodedUri = encodeURI(csvContent);
-  window.open(encodedUri);
-  var encodedUri = encodeURI(csvContent);
-  var link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "ligamed_Data.csv");
-  document.body.appendChild(link); // Required for FF
-
-  link.click(); // This will download the data file named "ligamed_data.csv".
-
-}
-*/
-
-//this was in the saving example. Not 100% sure why its needed
-function destroyClickedElement(event)
-{
-    document.body.removeChild(event.target);
-}
-
-/*
-No longer used. Using trained roll for angles instead of testing walk
-//adds array line of where training data starts/stops. also toggles training buttons on/off accordingly
-function breakGAIT(){
-    fullArray.push(["breakGAIT"]);
-    var x = document.getElementById("breakbutton");
-    x.style.display = "none";
-    var y = document.getElementById("resumebutton");
-    y.style.display = "block";
-  }
-function resumeGAIT(){
-    fullArray.push(["resumeGAIT"]);
-    var x = document.getElementById("breakbutton");
-    x.style.display = "block";
-    var y = document.getElementById("resumebutton");
-    y.style.display = "none";
-  }
-*/
 var isImpact = 0
 
+//toggle functions for UI elements. There is probably a better way to code this, but this works
 function stepToggleOn(){
     fullArray.push(["breakStep"]);
     var x = document.getElementById("togglestepon");
@@ -392,11 +335,9 @@ function stepToggleOff(){
     x.style.display = "none";
     var z = document.getElementById("breakinbuttons");
     z.style.display = "none";  
-
     isImpact = 0
   }
-
-
+//allows a 1 to be added to the main array whenever the button is pressed
 function beginStep(){
   isImpact = 1
     //console.log(fullArray)
@@ -404,7 +345,7 @@ function beginStep(){
   }
 
 
-
+//sends strings into the main array and toggles corresponging UI
 function breakleft(){
     fullArray.push(["breakleft"]);
     var x = document.getElementById("breakleftbutton");
@@ -451,11 +392,10 @@ function resumeright(){
     b.style.display = "none";
   }
 
+//saves to localdata
 function savedatalocal(){
 localStorage.setItem("ligamedData", JSON.stringify(fullArray));
 }
-
-
 
 //technically being used for determining if user is running/walking, but I really don't feel like changing this many names and causing more bugs
 //user walking
