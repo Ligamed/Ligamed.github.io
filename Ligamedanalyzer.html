@@ -92,19 +92,6 @@
 </body>
 <script type="text/javascript">
 
-
-
-var overallTime = [];
-var accX = [];
-var accY = [];
-var accZ = [];
-var velX = [];
-var velY = [];
-var velZ = [];
-var magAcc = [];
-var angX = [];
-var angY = [];
-var angZ = [];
 var isImpact = [];
 var trainoverallTime = [];
 var trainaccX = [];
@@ -121,9 +108,6 @@ var trainisImpact = [];
 
 var loadedtrainingdata = 0;
 var totalPercentageOut = []
-
-
-
 
 //function that runs like... everything
 function stuffEverythingHere() { 
@@ -148,6 +132,7 @@ function stuffEverythingHere() {
 	
   var angleMovedLeft =[];
   var angleMovedRight = [];
+
   //sets roll training data to its own arrays
   for (var i = 0; i <= fullArray.length-1; i++) {
   	if (fullArray[i][0] == "breakleft") {
@@ -174,6 +159,7 @@ function stuffEverythingHere() {
 
   	} 	
   }	
+
   	if(loadedtrainingdata == 0){
 	averagedLeftRoll = angleAverage(angleMovedLeft);
 	averagedRightRoll = angleAverage(angleMovedRight);
@@ -191,74 +177,7 @@ function stuffEverythingHere() {
   	document.getElementById("trainedrightdegrees").innerHTML = averagedRightRoll;
 
   	fullArray = determineStep(fullArray);
-	/*
-	//adds a bunch of 0's to the array so I stop getting so many array bound errors
-	//eh seems to have fixed itself somehow
-	var fixedarray = []
-	for (var i = 0; i <= fullArray.length-1; i++){
-  		var currentLine = []
-  		currentLine = fullArray[i];
-  		var trimmedline = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  		for (var j = 0; j <= 13; j++) {
-  			trimmedline[j] = currentLine[j];
-  		}
-  		fixedarray.push(trimmedline)
-  	}
 
-  	fullArray = fixedarray;
-	*/
-
-
-
-	/*
-	Not used atm. Using trained rolls
-  //set up GAIT training datasets
-  var trainGAIT = [];
-  var currentGAIT = 1
-  var avgMaxGAIT = [];
-  var avgMinGAIT = [];
-  //sets GAIT training data to its own arrays
-  for (var i = 0; i <= fullArray.length-1; i++) {
-  	var currentGAITdata = [];
-  	if (fullArray[i][0] == "breakGAIT") {
-  		trainGAIT.push(['GAIT TRAIN ' + currentGAIT]);
-  		
-  		var j=1;
-  		while(j==1){
-  			i=1+i;
-  			if (fullArray[i][0] == "resumeGAIT") {j=0;}
-  			else{
-  			trainGAIT.push(fullArray[i]);
-  			currentGAITdata.push(fullArray[i]);
-  			}
-
-  		}
-  		
-  		
-  		currentGAIT = currentGAIT + 1;
-  		avgMaxGAIT.push(maxRoll(currentGAITdata));
-  		avgMinGAIT.push(minRoll(currentGAITdata));
-  	}
-  } 	
-
-	averagedMaxGAIT = angleAverage(avgMaxGAIT);
-	averagedMinGAIT = angleAverage(avgMinGAIT);
-
-
-	if(loadedtrainingdata == 1){
-		averagedMinGAIT = trainedMinRoll
-		averagedMaxGAIT = trainedMaxRoll
-	}
-
-
-
-
-	document.getElementById("textMaxRoll").innerHTML = averagedMaxGAIT;
-	document.getElementById("textMinRoll").innerHTML = averagedMinGAIT;
-	
- 	*/
-
-	
 	//sets step training data to its own arrays
  	trainStepData = [];
  	for (var i = 0; i <= fullArray.length-1; i++) {
@@ -278,11 +197,9 @@ function stuffEverythingHere() {
   		}
   	}
 
-
-
 	trimmedArray = [];
 
-	//removes text and NaN's from data
+	//removes text and NaN's from data. Was originally needed for tensorflow, but then more code became dependent on it
   	for (var i = 50; i <= fullArray.length-1; i++){
   		var currentLine = []
   		currentLine = fullArray[i];
@@ -299,20 +216,9 @@ function stuffEverythingHere() {
   			
   		}
   		if (trimmedline[0] !=0) {trimmedArray.push(trimmedline)}
-
-  		
   	}
 
-
-  	/*
-  	//dumps first 50 lines of data that won't have angles
-  	//for some reason running this removed ALL the angles
-  	for (var i = 50; i <= trimmedArray.length-1; i++){
-  		trimmedArray[i] = trimmedArray[i-50]
-  	}
- 	*/
-
- 	//separates array out. This used to be for a different purpose, but it was here so I'm still using it
+ 	//separates array out. This used to be for a different purpose with tensorflow, but it was here so I'm still using it
 	for (var i = 0; i <= trainStepData.length-1; i++) {
 		trainoverallTime[i] = trainStepData[i][0];
 		trainaccX[i] = trainStepData[i][1];
@@ -336,10 +242,6 @@ function stuffEverythingHere() {
 
 		angX_MED = getMedian(trainangX)
 		angX_MAD = getMAD(trainangX)
-
-		//angY_MED = getMedian(trainangY)
-		//angY_MAD = getMAD(trainangY)
-
 	}
 
 	//loads MAD and Median for magnitude of accaleration and roll angle if needed
@@ -349,10 +251,6 @@ function stuffEverythingHere() {
 
 		angX_MED = trainedZscoreVals[2]
 		angX_MAD = trainedZscoreVals[3]
-
-		//angY_MED = trainedZscoreVals[4]
-		//angY_MAD = trainedZscoreVals[5]
-
 	}
 
 	//constant. I have no idea whats its actually called but Akshay never called it anything so I had to name it something
@@ -360,28 +258,8 @@ function stuffEverythingHere() {
 
 	for (var i = 0; i <= trimmedArray.length - 1; i++) {
 		trimmedArray[i][13] = getOutliers(trimmedArray[i][7],mag_MAD,mag_MED,THIRD_VAL)
-		trimmedArray[i][14] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)
-		//trimmedArray[i][15] = getOutliers(trimmedArray[i][9],angY_MAD,angY_MED,THIRD_VAL)				
+		trimmedArray[i][14] = getOutliers(trimmedArray[i][8],angX_MAD,angX_MED,THIRD_VAL)	
 	}
-
-
-	/*
-	not used atm. RIP tensorflow portion of code
-	for (var i = 0; i <= trimmedArray.length-1; i++) {
-		overallTime[i] = trimmedArray[i][0];
-		accX[i] = trimmedArray[i][1];
-		accY[i] = trimmedArray[i][2];
-		accZ[i] = trimmedArray[i][3];
-		velX[i] = trimmedArray[i][4];
-		velY[i] = trimmedArray[i][5];
-		velZ[i] = trimmedArray[i][6];
-		magAcc[i] = trimmedArray[i][7];
-		angX[i] = trimmedArray[i][8];
-		angY[i] = trimmedArray[i][9];
-		angZ[i] = trimmedArray[i][10];
-		isImpact[i] = trimmedArray[i][11];
-	}
-	*/
 
 		//adds table
 		headingsArray = trimmedArray;
@@ -389,7 +267,7 @@ function stuffEverythingHere() {
 		headingsArray.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Acceleration Magnitude Z-Score","Roll Angle Z-Score" ]);
 		headingsArray.reverse();
 		var tableArr = headingsArray
-		//https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
+		//from https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
 		//create a Table Object
 		let table = document.createElement('table');
 		//iterate over every array(row) within tableArr
@@ -426,23 +304,10 @@ function stuffEverythingHere() {
 					isProblem[isProblemIndex][20] = "left"
 					isProblemIndex = isProblemIndex + 1
 				}
-				/*
-				if(trimmedArray[i][15] > 3){
-					isProblem[isProblemIndex] = trimmedArray[i]
-					isProblem[isProblemIndex][20] = "yawright"
-					isProblemIndex = isProblemIndex + 1
-				}
-				if(trimmedArray[i][15] < -3){
-					isProblem[isProblemIndex] = trimmedArray[i]
-					isProblem[isProblemIndex][20] = "yawleft"
-					isProblemIndex = isProblemIndex + 1
-				}
-				*/
 			}
 		}
-			
 	}
-	console.log(isProblem)
+
 	var sprainFactor = riskAnalysis(isProblem,averagedLeftRoll,averagedRightRoll);
 	document.getElementById("textSprain").innerHTML = sprainFactor;
 
@@ -452,7 +317,7 @@ function stuffEverythingHere() {
 		headingsArray2.push(["TimeStamp","x","y","z","Roll Velocity","Pitch Velocity","Yaw Velocity","Magnitude of Acceleration","Roll","Pitch","Yaw","IsImpact","isRisk","Acceleration Magnitude Z-Score","Roll Angle Z-Score" ]);
 		headingsArray2.reverse();
 		var tableArr2 = headingsArray2
-		//https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
+		//from https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
 		//create a Table Object
 		let table2 = document.createElement('table');
 		//iterate over every array(row) within tableArr
@@ -470,76 +335,10 @@ function stuffEverythingHere() {
 		}
 		//append the compiled table to the DOM
 		document.getElementById("longTable2").appendChild(table2);		
-
-
-
-
 }
-//-----------------------------------------------------------------------------------------
-
-
-
-
-
-function getMedian(inputArray){
-	//#Source https://bit.ly/2neWfJ2 
-	//https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-88.php
-	const median = arr => {
-  		const mid = Math.floor(arr.length / 2),
-    	nums = [...arr].sort((a, b) => a - b);
-  		return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
-	};
-	return median(inputArray)
-}
-
-function getMAD(inputArray){
-	var meanVal = inputArray.reduce((a, b) => a + b, 0) / inputArray.length
-	var calcMAD = 0
-	for (var i = 0; i <= inputArray.length-1; i++){
-		calcMAD = Math.abs(inputArray[i] - meanVal) + calcMAD
-	}
-	var acutalMAD = calcMAD / (inputArray.length)
-	return acutalMAD
-
-}
-
-
-function getOutliers(inputVal,MAD,MEDIAN,THIRD_VAL){
-
-	var zval = THIRD_VAL * (inputVal - MEDIAN) / MAD
-
-	return zval
-}
-
 
 //-----------------------------------------------------------------------------------------
 //computation functions below
-
-
-/*
-Not used atm. GAIT angle stuff
-function maxRoll(inputArray){
-	var tempRollAngle = []
-	for (var i = 0; i <= inputArray.length-1; i++) {
-		tempRollAngle.push(inputArray[i][8])
-
-	}
-
-	var maxMoved = Math.max(...tempRollAngle);
-	return(maxMoved)
-}
-
-function minRoll(inputArray){
-	var tempRollAngle = []
-	for (var i = 0; i <= inputArray.length-1; i++) {
-		tempRollAngle.push(inputArray[i][8])
-
-	}
-
-	var minMoved = Math.min(...tempRollAngle);
-	return(minMoved)
-}
-*/
 
 //gets trained roll angle
 function angleIntegrate(inputArray){
@@ -563,22 +362,18 @@ function angleIntegrate(inputArray){
 	return anglex
 }
 
-//average function
+//average function. Used if multiple roll trains are done
 function angleAverage(inputArray){
 	var x = 0;
-
 	for (var i = 0; i <= inputArray.length - 1; i++) {
 		x = x + Number(inputArray[i]);
-
 	}
 	x = x / inputArray.length;
-
 	x = x.toFixed(2);
-
 	return x;
 }
 
-//Akshay is helping
+//Calculated magnitude of acceleration. Akshay is helping
 function accMagnitude(x,y,z){
 	var m = 0;
 	x = Math.pow(x,2);
@@ -616,7 +411,6 @@ function checkAngle(inputArray){
 				j = j-2;
 			}
 
-
 			x = x + inputArray[j][4]*(inputArray[j][0]-inputArray[j-1][0])/1000;
 			y = y + inputArray[j][5]*(inputArray[j][0]-inputArray[j-1][0])/1000;
 			z = z + inputArray[j][6]*(inputArray[j][0]-inputArray[j-1][0])/1000;
@@ -630,113 +424,7 @@ function checkAngle(inputArray){
 		inputArray[i][10] = z;
 	}
 	return inputArray
-
 }
-
-/*
-Yea this won't work with what we are doing now
-//checks chance of sprain. This has taken far too long to get. Neil provided pseudocode for this section
-function riskAnalysis(inputArray,min,max){
-	var countOut = 0;
-	var countIn = 0;
-
-
-	for (var i = 50; i <= inputArray.length - 1; i++) {
-		if (inputArray[i][9] > max || inputArray[i][8] < min){
-		countOut = countOut + 1;
-		}
-		else {
-			countIn = countIn + 1;
-		}
-	}
-	var percentageOut = countOut / (countIn + countOut)
-	return percentageOut	
-}
-*/
-
-
-
-
-//new riskAnalysis function because I am too lazy to fix the other code dependant on some of these names
-//also I got a bit carried away in this function and now it also controls most of the output
-function riskAnalysis(inputArray,min,max){
-	var numberOfLefts = 0
-	var numberOfRights = 0
-	var totalzscore = 0
-	for (var i = 0; i <= inputArray.length - 1; i++) {
-		if(inputArray[i][20] == "left"){
-			numberOfLefts += 1
-		}
-		else if(inputArray[i][20] == "right"){
-			numberOfRights += 1	
-		}
-		totalzscore += Math.pow((Math.abs(inputArray[i][14] - 2) * Math.abs(inputArray[i][13]) - 2),2)
-	}
-	var percentageOut = totalzscore / (trimmedArray.length)
-
-	if (numberOfLefts > 0 || numberOfLefts / numberOfRights > 3){
-		document.getElementById("resultimage").src = "roll_right.jpg";
-		document.getElementById("resulttext").innerHTML = "Keep your foot to the right more";
-	}
-	if (numberOfRights > 0 || numberOfRights / numberOfLefts > 3){
-		document.getElementById("resultimage").src = "roll_left.jpg";
-		document.getElementById("resulttext").innerHTML = "Keep your foot to the left more";
-	}
-
-	if (numberOfRights > 0 && numberOfLefts > 0){
-		document.getElementById("resultimage").src = "roll_both.jpg";
-		document.getElementById("resulttext").innerHTML = "Stop rolling your foot left and right";
-	}
-
-	if (numberOfRights == 0 && numberOfLefts ==0){
-		document.getElementById("resultimage").src = "roll_good.jpg";
-		document.getElementById("resulttext").innerHTML = "Your GAIT is optimal";
-	}
-	percentageOut = percentageOut.toFixed(4)
-	currenttime = new Date()
-
-
-	
-	totalPercentageOut = (JSON.parse(localStorage.getItem("savedPercentageOut") || "[]"));
-	if (totalPercentageOut == "[]"){
-		totalPercentageOut = [[currenttime,percentageOut]]
-	}
-	else{
-		totalPercentageOut.push([currenttime,percentageOut])
-	}
-	
-	localStorage.setItem("savedPercentageOut", JSON.stringify(totalPercentageOut));
-
-			//adds table
-		headingsArray3 = totalPercentageOut;
-		headingsArray3.reverse();
-		headingsArray3.push(["TimeStamp","Sprain Risk Factor"]);
-		headingsArray3.reverse();
-		var tableArr3 = headingsArray3
-		//https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
-		//create a Table Object
-		let table3 = document.createElement('table');
-		//iterate over every array(row) within tableArr
-		for (let row of tableArr3) {
-		//Insert a new row element into the table element
-		  table3.insertRow();
-		//Iterate over every index(cell) in each array(row)
-		  for (let cell of row) {
-		//While iterating over the index(cell)
-		//insert a cell into the table element
-		    let newCell = table3.rows[table3.rows.length - 1].insertCell();
-		//add text to the created cell element
-		    newCell.textContent = cell;
-		  }
-		}
-		//append the compiled table to the DOM
-		document.getElementById("longTable3").appendChild(table3);		
-
-
-	return percentageOut	
-}
-
-
 
 //Checks if instance within normal bounds. Neil provided pseudocode for this section and then edited it some more. I think the numbers came from a few of the trials him and Akshay were running
 function determineStep(inputArray){
@@ -781,35 +469,135 @@ function determineStep(inputArray){
 	return inputArray
 }
 
+//gets median from trained impacts
+function getMedian(inputArray){
+	//#Source https://bit.ly/2neWfJ2 
+	//from https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-88.php
+	const median = arr => {
+  		const mid = Math.floor(arr.length / 2),
+    	nums = [...arr].sort((a, b) => a - b);
+  		return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+	};
+	return median(inputArray)
+}
 
+//gets MAD from trained impacts
+function getMAD(inputArray){
+	var meanVal = inputArray.reduce((a, b) => a + b, 0) / inputArray.length
+	var calcMAD = 0
+	for (var i = 0; i <= inputArray.length-1; i++){
+		calcMAD = Math.abs(inputArray[i] - meanVal) + calcMAD
+	}
+	var acutalMAD = calcMAD / (inputArray.length)
+	return acutalMAD
+}
+
+//get z score from each line of the main array
+function getOutliers(inputVal,MAD,MEDIAN,THIRD_VAL){
+	var zval = THIRD_VAL * (inputVal - MEDIAN) / MAD
+	return zval
+}
+
+//new riskAnalysis function because I am too lazy to fix the other code dependant on some of these names
+//also I got a bit carried away in this function and now it also controls most of the output
+function riskAnalysis(inputArray,min,max){
+	var numberOfLefts = 0
+	var numberOfRights = 0
+	var totalzscore = 0
+	//records total number of lefts and rights
+	for (var i = 0; i <= inputArray.length - 1; i++) {
+		if(inputArray[i][20] == "left"){
+			numberOfLefts += 1
+		}
+		else if(inputArray[i][20] == "right"){
+			numberOfRights += 1	
+		}
+		totalzscore += Math.pow((Math.abs(inputArray[i][14] - 2) * Math.abs(inputArray[i][13]) - 2),2)
+	}
+	//sprain risk factor calculation
+	var percentageOut = totalzscore / (trimmedArray.length)
+
+	//suggested changes to gait
+	if (numberOfLefts > 0 || numberOfLefts / numberOfRights > 3){
+		document.getElementById("resultimage").src = "roll_right.jpg";
+		document.getElementById("resulttext").innerHTML = "Keep your foot to the right more";
+	}
+	if (numberOfRights > 0 || numberOfRights / numberOfLefts > 3){
+		document.getElementById("resultimage").src = "roll_left.jpg";
+		document.getElementById("resulttext").innerHTML = "Keep your foot to the left more";
+	}
+
+	if (numberOfRights > 0 && numberOfLefts > 0){
+		document.getElementById("resultimage").src = "roll_both.jpg";
+		document.getElementById("resulttext").innerHTML = "Stop rolling your foot left and right";
+	}
+
+	if (numberOfRights == 0 && numberOfLefts ==0){
+		document.getElementById("resultimage").src = "roll_good.jpg";
+		document.getElementById("resulttext").innerHTML = "Your GAIT is optimal";
+	}
+	percentageOut = percentageOut.toFixed(4)
+	currenttime = new Date()
+	
+	//saves ankle sprain risk factor into localdata and displays old ones
+	totalPercentageOut = (JSON.parse(localStorage.getItem("savedPercentageOut") || "[]"));
+	if (totalPercentageOut == "[]"){
+		totalPercentageOut = [[currenttime,percentageOut]]
+	}
+	else{
+		totalPercentageOut.push([currenttime,percentageOut])
+	}
+	
+	localStorage.setItem("savedPercentageOut", JSON.stringify(totalPercentageOut));
+
+		//adds table
+		headingsArray3 = totalPercentageOut;
+		headingsArray3.reverse();
+		headingsArray3.push(["TimeStamp","Sprain Risk Factor"]);
+		headingsArray3.reverse();
+		var tableArr3 = headingsArray3
+		//from https://medium.com/wdstack/quick-blurb-generating-a-table-from-an-array-in-javascript-41386fd449a9
+		//create a Table Object
+		let table3 = document.createElement('table');
+		//iterate over every array(row) within tableArr
+		for (let row of tableArr3) {
+		//Insert a new row element into the table element
+		  table3.insertRow();
+		//Iterate over every index(cell) in each array(row)
+		  for (let cell of row) {
+		//While iterating over the index(cell)
+		//insert a cell into the table element
+		    let newCell = table3.rows[table3.rows.length - 1].insertCell();
+		//add text to the created cell element
+		    newCell.textContent = cell;
+		  }
+		}
+		//append the compiled table to the DOM
+		document.getElementById("longTable3").appendChild(table3);		
+
+	return percentageOut	
+}
 
 //-----------------------------------------------------------------------------------------
 //Utility functions below
 
+//clears localdata
 function dataClear() {localStorage.clear()}
 
 //saves training data so it doesn't have to be done for each run
 function savedatalocal(){
 	localStorage.setItem("saveZscoreVals", JSON.stringify([mag_MED,mag_MAD,angX_MED,angX_MAD]));
-	//localStorage.setItem("averagedMinGAITVal", JSON.stringify(averagedMinGAIT));
-  	//localStorage.setItem("averagedMaxGAITVal", JSON.stringify(averagedMaxGAIT));
   	localStorage.setItem("averagedLeftRollVal", JSON.stringify(averagedLeftRoll));
   	localStorage.setItem("averagedRightRollVal", JSON.stringify(averagedRightRoll));
 }
-
 
 // Loads main data from localdata from data collection page
 function loadLocalData(){
 fullArray = JSON.parse(localStorage.getItem("ligamedData") || "[]");
 }
 
-
 //loads step training data
 function loadLocalDataSteps(){
-	//trainedMinRoll = JSON.parse(localStorage.getItem("averagedMinGAITVal") || "[]");
-	//trainedMinRoll = Number(trainedMinRoll)
-	//trainedMaxRoll = JSON.parse(localStorage.getItem("averagedMaxGAITVal") || "[]");
-	//trainedMaxRoll = Number(trainedMaxRoll)
 	trainedZscoreVals = JSON.parse(localStorage.getItem("saveZscoreVals") || "[]");
 	for (var i = 0; i <= trainedZscoreVals.length - 1; i++) {
 		 trainedZscoreVals[i] = Number(trainedZscoreVals[i]);
@@ -828,8 +616,8 @@ function toggleTable() {
     x.style.display = "none";
   }
 }
+//toggles table of problem points
 function toggleTable2() {
-
   var y = document.getElementById("longTable2");
   if (y.style.display === "none") {
     y.style.display = "block";
@@ -837,9 +625,8 @@ function toggleTable2() {
     y.style.display = "none";
   }
 }
-
+//toggles table of ankle sprain risk factor history
 function toggleTable3() {
-
   var y = document.getElementById("longTable3");
   if (y.style.display === "none") {
     y.style.display = "block";
@@ -847,14 +634,10 @@ function toggleTable3() {
     y.style.display = "none";
   }
 }
-//saves data to csv file
-function saveTextAsFile(){
-	//var headingsArray = trimmedArray;
-	//headingsArray.reverse();
-	//headingsArray.push(["TimeStamp","x","y","z","Roll_Velocity","Pitch_Velocity","Yaw_Velocity","Magnitude_of_Acceleration","Roll","Pitch","Yaw"]);
-	//headingsArray.reverse();
 
-	//https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+//saves data to csv file
+//from https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+function saveTextAsFile(){
 	let csvContent = "data:text/csv;charset=utf-8," 
    		 + headingsArray.map(e => e.join(",")).join("\n");
 	var encodedUri = encodeURI(csvContent);
@@ -864,12 +647,10 @@ function saveTextAsFile(){
 	link.setAttribute("href", encodedUri);
 	link.setAttribute("download", "ligamed_Data.csv");
 	document.body.appendChild(link); // Required for FF
-
 	link.click(); // This will download the data file named "ligamed_data.csv".
-
 }
 
-//Neil made me remove all the fun from this one
+//Hidden button to control load/save from csv functions
 function runData(){
 	var x = document.getElementById("line1");
     var y = document.getElementById("line2");
@@ -891,7 +672,6 @@ function runData(){
 function loadFileAsText()
 {
     var fileToLoad = document.getElementById("fileToLoad").files[0];
- 
     var fileReader = new FileReader();
     fileReader.onload = function(fileLoadedEvent) 
     {
