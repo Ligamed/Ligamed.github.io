@@ -1,4 +1,4 @@
-
+//original from https://create.arduino.cc/projecthub/8bitkick/sensor-data-streaming-with-arduino-683a6c?ref=user&ref_id=453051&offset=0
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
 const int ledPin = 22;
